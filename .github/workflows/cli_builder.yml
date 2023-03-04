@@ -22,5 +22,4 @@ jobs:
         go-version: 1.19
 
     - name: Build
-    - run: cd cli
-    - run: go build
+      run: cd cli && go build
