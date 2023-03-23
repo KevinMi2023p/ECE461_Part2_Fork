@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class PackagesPostController {
     
     @PostMapping("/packages")
-    public String packages() {
-        return "Packages!";
+    public void packages_plurual() {
+        System.out.println("Packages!");
     }
 
     @PostMapping("/package")
-    public String packageID() {
-        return "Package!";
+    public void package_single() {
+        System.out.println("Package!");
     }
 
 }

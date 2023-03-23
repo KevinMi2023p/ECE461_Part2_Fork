@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ResetController {
     
     @DeleteMapping("/reset")
-    public String reset() {
-        return "Reset!";
+    public void reset() {
+        System.out.println("Reset!");
     }
 
 }
