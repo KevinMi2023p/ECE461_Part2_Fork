@@ -18,6 +18,30 @@ func errorExit(msg string, a ...any) {
 	os.Exit(1)
 }
 
+func GetOwnerNameFromLink(link string) *github_util.OwnerName {
+	URL, err := url.Parse(link)
+	if err != nil {
+		return nil
+	}
+	owner, name := "", ""
+	if URL.Host == "github.com" {
+		log.Infof("Parsing github link %v", link)
+		parts := strings.Split(URL.Path, "/")
+		if len(parts) != 3 {
+			return nil
+		} else {
+			owner, name = parts[1], parts[2]
+		}
+	} else if URL.Host == "www.npmjs.com" {
+		log.Infof("Parsing npm link %v", link)
+		owner, name = ConvertNpmToGitHub(URL.Path)
+	} else {
+		return nil
+	}
+
+	return &github_util.OwnerName{Owner: owner, Name: name, Url: link}
+}
+
 func GetOwnersNamesFromFile(filename string) []github_util.OwnerName {
 	file, err := os.Open(filename)
 	if err != nil {
