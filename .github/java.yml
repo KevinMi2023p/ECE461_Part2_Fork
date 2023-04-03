@@ -1,0 +1,24 @@
+name: Build and Test
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Java
+      uses: actions/setup-java@v1
+      with:
+        java-version: '11'
+
+    - name: Build with Maven
+      run: mvn package
+
+    - name: Build Docker image
+      run: docker build -t my-docker-image .
+
+    - name: Check Docker image
+      run: docker run --rm my-docker-image
