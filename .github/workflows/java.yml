@@ -12,14 +12,21 @@ jobs:
     - name: Set up Java
       uses: actions/setup-java@v1
       with:
-        java-version: '17'
+        java-version: '11'
 
     - name: Build with Maven
       run: mvn package
       working-directory: api_paths
 
-    - name: Build Docker image
-      run: docker build -t my-docker-image .
+    - name: Build for Docker
+      run: |
+        docker build -t my-docker-image .
+        docker run --rm -d -p 8080:8080 --name my-docker-container my-docker-image
+        sleep 30
 
-    - name: Check Docker image
-      run: docker run --rm my-docker-image
+    - name: Verify Spring Boot application
+      run: |
+        curl http://localhost:8080/
+      
+    - name: Stop Docker container
+      run: docker stop my-docker-container
