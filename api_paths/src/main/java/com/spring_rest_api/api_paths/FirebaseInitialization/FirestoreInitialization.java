@@ -15,10 +15,16 @@ public class FirestoreInitialization {
     public void initialization(){
         FileInputStream serviceAccount = null;
         try{
-            serviceAccount =
-                    new FileInputStream("api_paths/serviceAccountKey.json");
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+//            serviceAccount =
+//                    new FileInputStream("api_paths/serviceAccountKey.json");
+//            FirebaseOptions options = new FirebaseOptions.Builder()
+//                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+//                    .build();
+//
+//            FirebaseApp.initializeApp(options);
+
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.getApplicationDefault())
                     .build();
 
             FirebaseApp.initializeApp(options);
