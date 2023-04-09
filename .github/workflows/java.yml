@@ -8,6 +8,16 @@ on:
 
 env:
   KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+  TYPE: service_account
+  PROJECT_ID: springex-64fb3
+  PRIVATE_KEY_ID: 52cdecc6ad8aa02d4b1c462b5084486ddaa04d4b
+  PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+  CLIENT_EMAIL: firebase-adminsdk-y6aad@springex-64fb3.iam.gserviceaccount.com
+  CLIENT_ID: 105156869469024779989
+  AUTH_URI: https://accounts.google.com/o/oauth2/auth
+  TOKEN_URI: https://oauth2.googleapis.com/token
+  AUTH_PROVIDER_X509_CERT_URL: https://www.googleapis.com/oauth2/v1/certs
+  CLIENT_X509_CERT_URL: https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-y6aad%40YOUR_PROJECT_ID.iam.gserviceaccount.com
 
 jobs:
   build:
@@ -20,6 +30,12 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: '17'
+
+    - name: Set up Firebase credentials
+      run: |
+        echo $PRIVATE_KEY | base64 --decode > accountKey.json
+        export GOOGLE_APPLICATION_CREDENTIALS=$PWD/accountKey.json
+        export GOOGLE_CLOUD_PROJECT=$PROJECT_ID
 
     - name: Replace sensitive information in application.properties
       run: |
