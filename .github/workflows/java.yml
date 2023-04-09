@@ -23,7 +23,7 @@ jobs:
 
     - name: Replace sensitive information in application.properties
       run: |
-        sed "s/\${KEYSTORE_PASSWORD}/${KEYSTORE_PASSWORD}/g" api_paths/src/main/resources/application.properties.template > api_paths/src/main/resources/application.properties
+        sed "s/\${KEYSTORE_PASSWORD}/${KEYSTORE_PASSWORD}/g" api_paths/src/main/resources/application.properties > api_paths/src/main/resources/application.properties
 
     - name: Build with Maven
       run: mvn package
