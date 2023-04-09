@@ -8,7 +8,6 @@ on:
 
 env:
   KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-  PROJECT_ID: springex-64fb3
 
 jobs:
   build:
@@ -22,13 +21,10 @@ jobs:
       with:
         java-version: '17'
 
-    - name: Decode service account key
-      run: echo ${{ secrets.PRIVATE_KEY }} | base64 --decode > accountKey.json
-
-    - name: Set environment variables
+    - name: Write service account key to file
       run: |
+        echo "${{ secrets.PRIVATE_KEY }}" > accountKey.json
         export GOOGLE_APPLICATION_CREDENTIALS=$PWD/accountKey.json
-        export GOOGLE_CLOUD_PROJECT=$PROJECT_ID
 
     - name: Replace sensitive information in application.properties
       run: |
