@@ -19,6 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    
+    - name: Set up GCC
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: latest
+        platform: x64
 
     - name: Set up Go
       uses: actions/setup-go@v3
@@ -35,12 +41,6 @@ jobs:
 
     - name: Build jheader
       run: cd cli && javac NetScoreMetric.java NetScoreUtil.java -h . ; cd ..
-    
-    - name: Set up GCC
-      uses: egor-tensin/setup-gcc@v1
-      with:
-        version: latest
-        platform: x64
 
     - name: Build clib
       run: cd cli && sudo g++ -fPIC -I"$JAVA_HOME" -I"$JAVA_HOME/linux" -shared -o $lib_home/libNetScoreUtil.so cli_NetScoreUtil.cpp libpackageanalyze.so ; cd ..
