@@ -12,7 +12,7 @@ import (
 
 func GetLast10ClosedIssues(owner string, name string) []metrics.IssueNode {
 	src := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
+		&oauth2.Token{AccessToken: os.Getenv("API_KEY")},
 	)
 	httpClient := oauth2.NewClient(context.Background(), src)
 
