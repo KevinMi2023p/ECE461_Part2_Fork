@@ -3,6 +3,10 @@
 
 name: Go
 
+variables:
+  lib_home: /usr/lib/x86_64-linux-gnu
+  java_home: /usr/lib/jvm/java-1.17.0-openjdk-amd64/include
+
 on:
   push:
     branches: [ "main" ]
@@ -21,5 +25,25 @@ jobs:
       with:
         go-version: 1.19
 
-    - name: Build
-      run: cd cli && go build
+    - name: Build golib
+      run: cd cli && go build -o libpackageanalyze.so -buildmode=c-shared main.go ; cd .. ; sudo cp cli/libpackageanalyze.* $(lib_home)
+
+    - name: Set up Java
+      uses: actions/setup-java@v1
+      with:
+        java-version: '17'
+
+    - name: Build jheader
+      run: cd cli && javac NetScoreMetric.java NetScoreUtil.java -h . ; cd ..
+    
+    - name: Set up GCC
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: latest
+        platform: x64
+
+    - name: Build clib
+      run: cd cli && sudo g++ -fPIC -I"$(java_home)" -I"$(java_home)/linux" -shared -o $(lib_home)/libNetScoreUtil.so cli_NetScoreUtil.cpp libpackageanalyze.so ; cd ..
+    
+    - name: Test javalib
+      run: java cli.NetScoreUtil
