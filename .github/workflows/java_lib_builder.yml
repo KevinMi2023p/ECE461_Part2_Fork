@@ -1,7 +1,7 @@
 # This workflow will build a golang project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
-name: Go
+name: GoToJava
 
 on:
   push:
@@ -9,9 +9,9 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  lib_home: /usr/lib/x86_64-linux-gnu
-  java_home: /usr/lib/jvm/java-1.17.0-openjdk-amd64/include
+# env:
+#   lib_home: /usr/lib/x86_64-linux-gnu
+#   java_home: /usr/lib/jvm/java-1.17.0-openjdk-amd64/include
 
 jobs:
 
@@ -32,7 +32,11 @@ jobs:
         go-version: 1.19
 
     - name: Build golib
-      run: cd cli && go build -o libpackageanalyze.so -buildmode=c-shared main.go ; cd .. ; sudo cp cli/libpackageanalyze.* $lib_home
+      run: |
+        cd cli 
+        go build -o libpackageanalyze.so -buildmode=c-shared main.go 
+        cd .. 
+        sudo cp cli/libpackageanalyze.* /usr/lib/x86_64-linux-gnu
 
     - name: Set up Java
       uses: actions/setup-java@v1
@@ -40,10 +44,16 @@ jobs:
         java-version: '17'
 
     - name: Build jheader
-      run: cd cli && javac NetScoreMetric.java NetScoreUtil.java -h . ; cd ..
+      run: |
+        cd cli
+        javac NetScoreMetric.java NetScoreUtil.java -h .
+        cd ..
 
     - name: Build clib
-      run: cd cli && sudo g++ -fPIC -I"/usr/lib/jvm/java-1.17.0-openjdk-amd64/include" -I"/usr/lib/jvm/java-1.17.0-openjdk-amd64/include/linux" -shared -o /usr/lib/x86_64-linux-gnu/libNetScoreUtil.so cli_NetScoreUtil.cpp libpackageanalyze.so ; cd ..
+      run: |
+        cd cli
+        sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /usr/lib/x86_64-linux-gnu/libNetScoreUtil.so cli_NetScoreUtil.cpp libpackageanalyze.so
+        cd ..
     
     - name: Test javalib
       run: java cli.NetScoreUtil
