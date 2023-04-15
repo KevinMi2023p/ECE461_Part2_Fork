@@ -3,14 +3,49 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 */
 package main
 
-import (
-	"fmt"
-	"io"
-	"os"
+import "fmt"
+import "io"
+import "os"
 
-	"github.com/anthony-pei/ECE461/cli/cmd"
-	log "github.com/sirupsen/logrus"
-)
+import "github.com/anthony-pei/ECE461/cli/cmd"
+import log "github.com/sirupsen/logrus"
+
+import "github.com/anthony-pei/ECE461/cli/file_handler"
+import "github.com/anthony-pei/ECE461/cli/github_util"
+import "github.com/anthony-pei/ECE461/cli/metrics"
+
+/*
+#cgo LDFLAGS: -lstdc++ -lm
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include "NetScoreMetric.h"
+*/
+import "C"
+
+//export CalculateNetScoreMetric
+func CalculateNetScoreMetric(link string, metric *C.NetScoreMetric) C.bool {
+	name := file_handler.GetOwnerNameFromLink(link) // Not error checking file name
+
+	if name == nil {
+		return C.bool(false)
+	}
+
+	module := github_util.GetGithubModule(*name)
+
+	netscoreModule := metrics.NetScoreMetric{URL: module.GetGitHubUrl()}
+	netscoreModule.CalculateScore(module)
+	
+	(*metric).License = C.float(netscoreModule.License)
+	(*metric).Correctness = C.float(netscoreModule.Correctness)
+	(*metric).BusFactor = C.float(netscoreModule.Busfactor)
+	(*metric).RampUp = C.float(netscoreModule.Rampup)
+	(*metric).ResponsiveMaintainer = C.float(netscoreModule.Responsiveness)
+	(*metric).NetScore = C.float(netscoreModule.Netscore)
+
+	return C.bool(true)
+}
 
 func logging_init() {
 	lf, exists := os.LookupEnv("LOG_FILE")
@@ -44,3 +79,4 @@ func main() {
 	logging_init()
 	cmd.Execute()
 }
+
