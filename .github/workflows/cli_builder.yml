@@ -43,9 +43,7 @@ jobs:
       run: cd cli && javac NetScoreMetric.java NetScoreUtil.java -h . ; cd ..
 
     - name: Build clib
-      run: cd cli
-      run: sudo g++ -fPIC -I"/usr/lib/jvm/java-1.17.0-openjdk-amd64/include" -I"/usr/lib/jvm/java-1.17.0-openjdk-amd64/include/linux" -shared -o /usr/lib/x86_64-linux-gnu/libNetScoreUtil.so cli_NetScoreUtil.cpp libpackageanalyze.so
-      run: cd ..
+      run: cd cli && sudo g++ -fPIC -I"/usr/lib/jvm/java-1.17.0-openjdk-amd64/include" -I"/usr/lib/jvm/java-1.17.0-openjdk-amd64/include/linux" -shared -o /usr/lib/x86_64-linux-gnu/libNetScoreUtil.so cli_NetScoreUtil.cpp libpackageanalyze.so ; cd ..
     
     - name: Test javalib
       run: java cli.NetScoreUtil
