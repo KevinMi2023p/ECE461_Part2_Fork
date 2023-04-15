@@ -1,0 +1,43 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+env:
+  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: adopt
+
+    - name: Write service account key to file
+      run: |
+        echo "${{ secrets.PRIVATE_KEY }}" > accountKey.json
+        export GOOGLE_APPLICATION_CREDENTIALS=$PWD/accountKey.json
+
+    - name: Replace sensitive information in application.properties
+      run: |
+        sed "s/\${KEYSTORE_PASSWORD}/${KEYSTORE_PASSWORD}/g" api_paths/src/main/resources/application.properties > api_paths/src/main/resources/application.properties
+
+    - name: Run tests
+      run: |
+        mvn test --file api_paths/pom.xml
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: api_paths/target/surefire-reports/
+
