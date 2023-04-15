@@ -36,7 +36,7 @@ jobs:
         cd cli 
         go build -o libpackageanalyze.so -buildmode=c-shared main.go 
         cd .. 
-        sudo cp cli/libpackageanalyze.* /usr/lib/x86_64-linux-gnu
+        sudo cp cli/libpackageanalyze.* /usr/lib
 
     - name: Set up Java
       uses: actions/setup-java@v1
@@ -52,7 +52,7 @@ jobs:
     - name: Build clib
       run: |
         cd cli
-        sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /usr/lib/x86_64-linux-gnu/libNetScoreUtil.so cli_NetScoreUtil.cpp libpackageanalyze.so
+        sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /usr/lib/libNetScoreUtil.so cli_NetScoreUtil.cpp libpackageanalyze.so
         cd ..
     
     - name: Test javalib
