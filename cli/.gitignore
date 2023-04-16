@@ -1,6 +1,0 @@
-cli.exe
-.env
-*.txt
-temp
-libpackageanalyze.*
-*.class
