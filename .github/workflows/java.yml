@@ -26,10 +26,6 @@ jobs:
         echo "${{ secrets.PRIVATE_KEY }}" > accountKey.json
         export GOOGLE_APPLICATION_CREDENTIALS=$PWD/accountKey.json
 
-    - name: Replace sensitive information in application.properties
-      run: |
-        sed "s/\${KEYSTORE_PASSWORD}/${KEYSTORE_PASSWORD}/g" api_paths/src/main/resources/application.properties > api_paths/src/main/resources/application.properties
-
     - name: Build with Maven
       run: mvn package
       working-directory: api_paths
