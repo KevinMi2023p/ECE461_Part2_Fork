@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.spring_rest_api.api_paths.entity.Product;
 import com.spring_rest_api.api_paths.service.PackageIdService;
 
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Objects;
@@ -30,7 +32,7 @@ public class PackageIdController {
     }
 
     @PutMapping("/package/{id}")
-    public void putMethodName(@PathVariable String id) {
+    public void putMethodName(@PathVariable String id, @RequestBody Product product) throws ExecutionException, InterruptedException {
         System.out.println("Put! %s" + id);
     }
 
