@@ -17,6 +17,7 @@ public class PackageIdService {
     private static final String COLLECTION_NAME = "Packages";
 
     // Returns a String representation of the document found in Packages
+    // Returns null if the document can't be found
     public String getPackage(String id) throws ExecutionException, InterruptedException{
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference cR = db.collection(COLLECTION_NAME);
@@ -24,7 +25,7 @@ public class PackageIdService {
         ApiFuture<DocumentSnapshot> future = docRef.get();
         DocumentSnapshot document = future.get();
 
-        return (document.exists()) ? document.getData().toString() : "Package does not exist.";
+        return (document.exists()) ? document.getData().toString() : null;
     }
 
 }
