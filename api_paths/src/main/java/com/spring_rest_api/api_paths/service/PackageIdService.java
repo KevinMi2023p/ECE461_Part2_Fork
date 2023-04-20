@@ -36,9 +36,6 @@ public class PackageIdService {
         if (!document.exists()) {return false;}
         // Warning: Deleting a document does not delete its subcollections!
         ApiFuture<WriteResult> writeRes = docRef.delete();
-
-        System.out.println("Update time : " + writeRes.get().getUpdateTime());
-
         return true;
     }
 }
