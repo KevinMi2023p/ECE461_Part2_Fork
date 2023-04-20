@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 @RestController
 public class PackageIdController {
+    private ResponseEntity<String> notFoundError = ResponseEntity.status(HttpStatus.NOT_FOUND).body("Package does not exist.");
 
     @Autowired
     PackageIdService packageIdService;
@@ -25,10 +26,7 @@ public class PackageIdController {
     @GetMapping("/package/{id}")
     public ResponseEntity<String> packageId(@PathVariable String id) throws ExecutionException, InterruptedException {
         String document_string = packageIdService.getPackage(id);
-        HttpStatus status = (Objects.equals(document_string, "Package does not exist.")) ?
-                HttpStatus.NOT_FOUND : HttpStatus.OK;
-
-        return ResponseEntity.status(status).body(document_string);
+        return (document_string == null) ? notFoundError : ResponseEntity.status(HttpStatus.OK).body(document_string);
     }
 
     @PutMapping("/package/{id}")
@@ -37,8 +35,10 @@ public class PackageIdController {
     }
 
     @DeleteMapping("/package/{id}")
-    public void deleteMethodName(@PathVariable String id) {
-        System.out.println("Delete! %s" + id);
+    public ResponseEntity<String> deleteMethodName(@PathVariable String id) throws ExecutionException, InterruptedException {
+        boolean deletedDoc = packageIdService.deletePackage(id);
+        String delMsg = "Package is deleted.";
+        return (deletedDoc == false) ? notFoundError : ResponseEntity.status(HttpStatus.OK).body(delMsg);
     }
 
 }
