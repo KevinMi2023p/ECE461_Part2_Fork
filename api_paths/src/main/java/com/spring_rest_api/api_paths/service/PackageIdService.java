@@ -15,13 +15,12 @@ import com.google.firebase.cloud.FirestoreClient;
 @Service
 public class PackageIdService {
     private static final String COLLECTION_NAME = "Packages";
+    private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
 
     // Returns a String representation of the document found in Packages
     // Returns null if the document can't be found
     public String getPackage(String id) throws ExecutionException, InterruptedException{
-        Firestore db = FirestoreClient.getFirestore();
-        CollectionReference cR = db.collection(COLLECTION_NAME);
-        DocumentReference docRef = cR.document(id);
+        DocumentReference docRef = collectionReference.document(id);
         ApiFuture<DocumentSnapshot> future = docRef.get();
         DocumentSnapshot document = future.get();
 
