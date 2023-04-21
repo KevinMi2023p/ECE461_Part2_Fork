@@ -47,16 +47,28 @@ public class PackageIdService {
 
 
     // Check if package has matching metadata and then updates the package.
-    // public boolean stringJson_To_Map(String old_doc_string, Product new_package) throws ExecutionException, InterruptedException {
-    //     ObjectMapper mapper = new ObjectMapper();
+    public boolean updatePackage(String old_doc_string, Product new_package) throws ExecutionException, InterruptedException {
+        ObjectMapper mapper = new ObjectMapper();
 
-    //     try {
-    //         Map<String, Object> map = mapper.readValue(old_doc_string, Map.class);
-    //         System.out.println(map);
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //     }
+        try {
+            Product old_Product = mapper.readValue(old_doc_string, Product.class);
+            System.out.println(old_Product.getMetadata().getID());
+            System.out.println(old_Product.getMetadata().getVersion());
+            System.out.println(old_Product.getMetadata().getName());
+            
+            // metadata must match according to the Yaml
+            if (
+                !old_Product.getMetadata().getID().equals(new_package.getMetadata().getID()) ||
+                !old_Product.getMetadata().getName().equals(new_package.getMetadata().getName()) ||
+                !old_Product.getMetadata().getVersion().equals(new_package.getMetadata().getVersion())
+            ) {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
 
-    //     return true;
-    // }
+        return true;
+    }
 }
