@@ -2,7 +2,6 @@ package com.spring_rest_api.api_paths.service;
 
 import com.spring_rest_api.api_paths.entity.Product;
 
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.stereotype.Service;
@@ -46,9 +45,9 @@ public class PackageIdService {
     }
 
 
-    // Check if package has matching metadata and then return new Product 
-    // Returns null if metadata isn't matching
-    public Product checkSameMetaData(String old_doc_string, Product new_package) throws ExecutionException, InterruptedException {
+    // Check if package has matching metadata 
+    // Returns false also if string isn't in JSON format
+    public boolean checkSameMetaData(String old_doc_string, Product new_package) throws ExecutionException, InterruptedException {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
@@ -60,14 +59,14 @@ public class PackageIdService {
                 !old_Product.getMetadata().getName().equals(new_package.getMetadata().getName()) ||
                 !old_Product.getMetadata().getVersion().equals(new_package.getMetadata().getVersion())
             ) {
-                return null;
+                return false;
             }
 
-            return old_Product;
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return null;
+        return false;
     }
 }
