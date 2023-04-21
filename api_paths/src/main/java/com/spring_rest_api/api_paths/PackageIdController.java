@@ -37,6 +37,10 @@ public class PackageIdController {
         if (document_string == null)
             return notFoundError;
         
+        boolean res = packageIdService.checkSameMetaData(document_string, product);
+        if (res == false)
+            return notFoundError;
+
         String successMsg = "Version is updated.";
         return ResponseEntity.status(HttpStatus.OK).body(successMsg);
     }
