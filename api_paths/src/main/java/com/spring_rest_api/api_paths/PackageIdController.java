@@ -32,8 +32,13 @@ public class PackageIdController {
     }
 
     @PutMapping("/package/{id}")
-    public void putMethodName(@PathVariable String id, @RequestBody Product product) throws ExecutionException, InterruptedException {
-        System.out.println("Put! %s" + id);
+    public ResponseEntity<String> putMethodName(@PathVariable String id, @RequestBody Product product) throws ExecutionException, InterruptedException {
+        String document_string = packageIdService.getPackage(id);
+        if (document_string == null)
+            return notFoundError;
+        
+        String successMsg = "Version is updated.";
+        return ResponseEntity.status(HttpStatus.OK).body(successMsg);
     }
 
     @DeleteMapping("/package/{id}")
