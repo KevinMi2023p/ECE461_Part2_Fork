@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.spring_rest_api.api_paths.entity.Product;
 import com.spring_rest_api.api_paths.service.PackageIdService;
+import com.spring_rest_api.api_paths.service.PackageService;
+
 
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +27,9 @@ public class PackageIdController {
     @Autowired
     PackageIdService packageIdService;
 
+    @Autowired
+    PackageService packageService;
+
     @GetMapping("/package/{id}")
     public ResponseEntity<String> packageId(@PathVariable String id) throws ExecutionException, InterruptedException {
         String document_string = packageIdService.getPackage(id);
@@ -33,13 +38,18 @@ public class PackageIdController {
 
     @PutMapping("/package/{id}")
     public ResponseEntity<String> putMethodName(@PathVariable String id, @RequestBody Product product) throws ExecutionException, InterruptedException {
-        String document_string = packageIdService.getPackage(id);
-        if (document_string == null)
+        String old_document_string = packageIdService.getPackage(id);
+        if (old_document_string == null)
             return notFoundError;
         
-        boolean res = packageIdService.checkSameMetaData(document_string, product);
+        boolean res = packageIdService.checkSameMetaData(old_document_string, product);
         if (res == false)
             return notFoundError;
+
+        // Couldn't find Cloud Firestore document to update existing data
+        // Solution is to delete existing data then reupload new data
+        packageIdService.deletePackage(id);
+        packageService.savePackage(product);
 
         String successMsg = "Version is updated.";
         return ResponseEntity.status(HttpStatus.OK).body(successMsg);
