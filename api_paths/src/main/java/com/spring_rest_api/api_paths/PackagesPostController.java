@@ -32,7 +32,6 @@ public class PackagesPostController {
 
     @PostMapping("/package")
     public ResponseEntity<String> package_single(@RequestBody Product product) throws ExecutionException, InterruptedException {
-        System.out.println(product.getMetadata().getName());
         //packageService.savePackage(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(packageService.savePackage(product));
 
