@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException;
 
 @RestController
 public class PackageIdController {
-    private ResponseEntity<String> notFoundError = ResponseEntity.status(HttpStatus.NOT_FOUND).body("Package does not exist.");
+    private final ResponseEntity<String> notFoundError = ResponseEntity.status(HttpStatus.NOT_FOUND).body("Package does not exist.");
 
     @Autowired
     PackageIdService packageIdService;
