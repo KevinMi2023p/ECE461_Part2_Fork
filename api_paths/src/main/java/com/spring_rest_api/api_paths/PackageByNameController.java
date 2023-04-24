@@ -22,11 +22,10 @@ public class PackageByNameController {
     PackageNameService packageNameService;
     
 	@GetMapping("/package/byName/{name}")
-	public String packageByName(@PathVariable String name) throws ExecutionException, InterruptedException {
-        // Integer res = packageNameService.removeByName(name);
-        // System.out.println(res);
-
-		return String.format("PackageByName %s!", name);
+	public ResponseEntity<String> packageByName(@PathVariable String name) throws ExecutionException, InterruptedException {
+        String result = packageNameService.getByName(name);
+        
+        return (result == null) ? notFoundError : ResponseEntity.ok().body(result);
 	}
 
     @DeleteMapping("/package/byName/{name}")
