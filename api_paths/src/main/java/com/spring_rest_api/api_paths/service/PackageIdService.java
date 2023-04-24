@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class PackageIdService {
-    private static final String COLLECTION_NAME = "Packages";
+    private final String COLLECTION_NAME = "Packages";
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
     private Gson gson = new Gson();     // using .toString doesn't keep the quotes on the JSON
 
