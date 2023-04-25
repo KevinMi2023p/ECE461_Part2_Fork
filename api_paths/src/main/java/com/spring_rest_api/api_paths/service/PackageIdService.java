@@ -10,9 +10,6 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.WriteResult;
-import com.google.common.util.concurrent.ExecutionError;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.Gson;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +37,7 @@ public class PackageIdService {
         DocumentSnapshot document = docRef.get().get();
         if (!document.exists()) {return false;}
         // Warning: Deleting a document does not delete its subcollections!
-        ApiFuture<WriteResult> writeRes = docRef.delete();
+        docRef.delete();
         return true;
     }
 
