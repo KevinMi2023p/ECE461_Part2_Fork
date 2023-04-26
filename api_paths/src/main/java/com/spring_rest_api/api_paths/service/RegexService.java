@@ -27,9 +27,11 @@ public class RegexService {
     public void getVersionName(RegexSchema regexSchema) throws ExecutionException, InterruptedException {
         // Pattern regex = Pattern.compile(regexSchema.getRegex());
 
-        Query query = collectionReference.whereEqualTo(fieldToCheck, regexSchema.getRegex());
+        // https://firebase.google.com/docs/firestore/solutions/search?provider=algolia
+        // Firestore doesn't have a query by Regex function, they suggested 3rd party solutions
+        // I'm don't feel like doing that, this way works but slight performance hit (still fast)
 
-        System.out.println(query.get().get().size());
+        // Query query = collectionReference.whereEqualTo(fieldToCheck, regexSchema.getRegex());
 
         ArrayList<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 
