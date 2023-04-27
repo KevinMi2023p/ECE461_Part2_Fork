@@ -38,6 +38,8 @@ public class RegexService {
         // I'm don't feel like doing that, this way works but slight performance hit (still fast)
         ApiFuture<QuerySnapshot> querySnapshot = collectionReference.get();
 
+        // The way I did was to go through each document and run a Regex comp on it
+        // Firestore says this isn't the optimal way, but it's a way that works
         for (DocumentSnapshot document : querySnapshot.get().getDocuments()) {
             Map<String, Object> data = document.getData();
             Map<String, Object> metaData = (Map<String, Object>) data.get("metadata");
