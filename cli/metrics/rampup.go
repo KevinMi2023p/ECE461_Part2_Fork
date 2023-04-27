@@ -3,7 +3,7 @@ package metrics
 import (
 	"math"
 
-	"github.com/anthony-pei/ECE461/cli/code_analysis"
+	"github.com/Alethon/ECE461_Part2/cli/code_analysis"
 	log "github.com/sirupsen/logrus"
 )
 

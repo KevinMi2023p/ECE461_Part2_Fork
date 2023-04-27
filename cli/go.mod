@@ -1,4 +1,4 @@
-module github.com/anthony-pei/ECE461/cli
+module github.com/Alethon/ECE461_Part2/cli
 
 go 1.19
 

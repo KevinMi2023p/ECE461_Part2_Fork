@@ -4,7 +4,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"os/exec"
 
-	"github.com/anthony-pei/ECE461/cli/metrics"
+	"github.com/Alethon/ECE461_Part2/cli/metrics"
 	"github.com/google/go-github/github"
 )
 

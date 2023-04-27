@@ -9,7 +9,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/anthony-pei/ECE461/cli/github_util"
+	"github.com/Alethon/ECE461_Part2/cli/github_util"
 )
 
 func errorExit(msg string, a ...any) {
