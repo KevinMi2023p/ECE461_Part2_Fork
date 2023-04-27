@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/anthony-pei/ECE461/cli/file_handler"
-	"github.com/anthony-pei/ECE461/cli/github_util"
-	"github.com/anthony-pei/ECE461/cli/metrics"
+	"github.com/Alethon/ECE461_Part2/cli/file_handler"
+	"github.com/Alethon/ECE461_Part2/cli/github_util"
+	"github.com/Alethon/ECE461_Part2/cli/metrics"
 	"github.com/spf13/cobra"
 )
 
