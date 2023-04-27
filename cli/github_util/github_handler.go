@@ -7,7 +7,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/anthony-pei/ECE461/cli/metrics"
+	"github.com/Alethon/ECE461_Part2/cli/metrics"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
@@ -70,12 +70,12 @@ func GetGithubModule(ownerName OwnerName) metrics.Module {
 func GetGithubModules(ownerNames []OwnerName) []metrics.Module {
 	res := []metrics.Module{}
 	ctx := context.Background()
-	token, has_token := os.LookupEnv("GITHUB_TOKEN")
+	token, has_token := os.LookupEnv("API_KEY")
 	if !has_token {
-		errorExit("GITHUB_TOKEN variable not in environment, please set it in enviroment variables")
+		errorExit("API_KEY variable not in environment, please set it in enviroment variables")
 	}
 	if len(token) == 0 {
-		errorExit("GITHUB_TOKEN variable is present, but not set to a value")
+		errorExit("API_KEY variable is present, but not set to a value")
 	}
 
 	ts := oauth2.StaticTokenSource(

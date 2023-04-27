@@ -3,6 +3,7 @@ package com.spring_rest_api.api_paths.service;
 import com.spring_rest_api.api_paths.entity.Product;
 
 import java.util.concurrent.ExecutionException;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,14 @@ public class PackageIdService {
         DocumentSnapshot document = future.get();
 
         return (document.exists()) ? gson.toJson(document.getData()) : null;
+    }
+
+    // Returns null if the document can't be found
+    public Map<String, Object> getPackageData(String id) throws ExecutionException, InterruptedException{
+        DocumentReference docRef = collectionReference.document(id);
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        DocumentSnapshot document = future.get();
+        return document.getData();
     }
 
 
