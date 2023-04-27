@@ -31,10 +31,10 @@ jobs:
 
     - name: Build golib
       run: |
-        cd cli 
+        cd cli
         go build -o libpackageanalyze.so -buildmode=c-shared main.go 
-        cd .. 
-        sudo cp cli/libpackageanalyze.* /usr/lib
+        sudo cp libpackageanalyze.* /usr/lib
+        cd ..
 
     - name: Set up Java
       uses: actions/setup-java@v1
@@ -42,16 +42,13 @@ jobs:
         java-version: '17'
 
     - name: Build jheader
-      run: |
-        cd cli
-        javac NetScoreMetric.java NetScoreUtil.java -h .
-        cd ..
+      run: javac api_paths/src/main/java/com/cli/*.java -h ./cli
 
     - name: Build clib
-      run: |
-        cd cli
-        sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /usr/lib/libNetScoreUtil.so cli_NetScoreUtil.cpp libpackageanalyze.so
-        cd ..
+      run: sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /usr/lib/libNetScoreUtil.so cli/com_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
     
     - name: Test javalib
-      run: java cli.NetScoreUtil
+      run: |
+        cd api_paths/src/main/java
+        java com.cli.NetScoreUtil
+        cd ../../../..
