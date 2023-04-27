@@ -1,4 +1,4 @@
-package cli;
+package com.cli;
 
 public class NetScoreMetric {
     public float License;
