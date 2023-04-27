@@ -1,4 +1,4 @@
-package com.cli;
+package com.spring_rest_api.cli;
 
 public class NetScoreUtil {
     static { System.loadLibrary("NetScoreUtil"); }

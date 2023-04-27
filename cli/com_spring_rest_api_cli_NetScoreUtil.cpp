@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <jni.h>
-#include "com_cli_NetScoreUtil.h"
+#include "com_spring_rest_api_cli_NetScoreUtil.h"
 #include "NetScoreMetric.h"
 #include "libpackageanalyze.h"
 
-JNIEXPORT jobject JNICALL Java_com_cli_NetScoreUtil_CalculateNetScore(JNIEnv *env, jclass clazz, jstring url) {
+JNIEXPORT jobject JNICALL Java_com_spring_1rest_1api_cli_NetScoreUtil_CalculateNetScore(JNIEnv *env, jclass clazz, jstring url) {
     GoString gs;
     NetScoreMetric cMetric;
 

@@ -42,13 +42,13 @@ jobs:
         java-version: '17'
 
     - name: Build jheader
-      run: javac api_paths/src/main/java/com/cli/*.java -h ./cli
+      run: javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
 
     - name: Build clib
-      run: sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /usr/lib/libNetScoreUtil.so cli/com_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
+      run: sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /usr/lib/libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
     
     - name: Test javalib
       run: |
         cd api_paths/src/main/java
-        java com.cli.NetScoreUtil
+        java com.spring_rest_api.cli.NetScoreUtil
         cd ../../../..

@@ -14,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.spring_rest_api.api_paths.service.PackageIdService;
-import com.cli.NetScoreMetric;
-import com.cli.NetScoreUtil;
+import com.spring_rest_api.cli.NetScoreMetric;
+import com.spring_rest_api.cli.NetScoreUtil;
 
 @RestController
 public class RaterController {
