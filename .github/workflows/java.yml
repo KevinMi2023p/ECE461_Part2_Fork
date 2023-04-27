@@ -58,7 +58,7 @@ jobs:
     # TODO: copy ./libNetScoreUtil.so to /usr/lib/ in the docker
     - name: Build for Docker
       run: |
-        docker build -t my-docker-image .
+        docker build -t my-docker-image -e "API_KEY=$API_KEY" .
         docker run --rm -d -p 8080:8080 --name my-docker-container -v ${PWD}/api_paths/src/main/resources/application.properties:/app/resources/application.properties my-docker-image
         sleep 30
 
