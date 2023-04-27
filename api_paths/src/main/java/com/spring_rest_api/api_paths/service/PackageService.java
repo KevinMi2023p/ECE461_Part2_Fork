@@ -57,7 +57,7 @@ public class PackageService extends DbCollectionService {
         }
 
         // return string form of current metadata value
-        return docSs.getData().get("metadata").toString();
+        return docSs.getData().toString();
     }
 }
     
