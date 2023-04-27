@@ -44,7 +44,7 @@ public class RaterController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Package does not exist.");
         }
 
-        String packageUrl = (String) packageData.get("URL");
+        String packageUrl = (String) ((Map<String, Object>) packageData.get("data")).get("URL");
 
         if (packageUrl == null) {
             String resultMessage = String.format("Package with id = \"%s\" did not have a URL", id);
