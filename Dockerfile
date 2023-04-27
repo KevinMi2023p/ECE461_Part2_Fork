@@ -10,12 +10,12 @@ COPY . /app
 ENV API_KEY=$API_KEY_ARG
 
 # Copy ./libNetScoreUtil.so to /usr/lib/
-COPY --from=build /app/libNetScoreUtil.so /usr/lib/
-RUN mvn -f /app/api_paths/pom.xml clean package
+COPY /app/libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
 # Use AdoptOpenJDK for base image.
 # https://hub.docker.com/_/adoptopenjdk
 FROM openjdk:17-alpine
+RUN mvn -f /app/api_paths/pom.xml clean package
 # Copy the jar to the production image from the build stage.
 COPY --from=build /app/api_paths/target/*.jar /app/app.jar
 
