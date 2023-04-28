@@ -3,7 +3,7 @@ package com.spring_rest_api.api_paths.entity;
 public class AuthenticationRequest {
 
     private User user;
-    private Secret secret;
+    private UserAuthenticationInfo userAuthenticationInfo;
 
     public User getUser() {
         return user;
@@ -13,11 +13,12 @@ public class AuthenticationRequest {
         this.user = user;
     }
 
-    public Secret getSecret() {
-        return secret;
+    public UserAuthenticationInfo getUserAuthenticationInfo() {
+        return userAuthenticationInfo;
     }
 
-    public void setSecret(Secret secret) {
-        this.secret = secret;
+    public void setUserAuthenticationInfo(UserAuthenticationInfo userAuthenticationInfo) {
+        this.userAuthenticationInfo = userAuthenticationInfo;
     }
 }
+
