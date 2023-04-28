@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
+
+import javax.annotation.PostConstruct;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -215,4 +218,39 @@ public class AuthenticateService {
             throw new IllegalStateException("Token not found in token usage collection.");
         }
     }
+
+    // The following is for default username and secret
+    @PostConstruct
+    public void createDefaultUser() {
+        String defaultUsername = "admin";
+        String defaultPassword = "admin";
+        boolean defaultIsAdmin = true;
+
+        try {
+            // Check if the default user already exists
+            Firestore dbFirestore = FirestoreClient.getFirestore();
+            DocumentReference docRef = dbFirestore.collection(COLLECTION_NAME).document(defaultUsername);
+            ApiFuture<DocumentSnapshot> document = docRef.get();
+            DocumentSnapshot doc = document.get();
+
+            if (!doc.exists()) {
+                // Create a new user with the specified username and password
+                User defaultUser = new User();
+                defaultUser.setName(defaultUsername);
+
+                Secret userSecret = new Secret();
+                userSecret.setPassword(defaultPassword);
+
+                defaultUser.setIsAdmin(defaultIsAdmin);
+
+                saveUser(defaultUser, userSecret);
+                logger.info("Default user created: {}", defaultUsername);
+            } else {
+                logger.info("Default user already exists: {}", defaultUsername);
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            logger.error("Error creating default user: {}", e.getMessage());
+        }
+    }
+
 }

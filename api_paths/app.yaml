@@ -1,0 +1,6 @@
+runtime: java11
+instance_class: F1
+entrypoint: 'java -jar target/your-app-name.jar'
+
+env_variables:
+  SPRING_PROFILES_ACTIVE: gcp

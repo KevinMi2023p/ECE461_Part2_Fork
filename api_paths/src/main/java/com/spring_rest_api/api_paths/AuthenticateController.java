@@ -67,4 +67,8 @@ public class AuthenticateController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing the user.");
         }
     }
+
+    // The following is for the reset functionality:
+
+    
 }
