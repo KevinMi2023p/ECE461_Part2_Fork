@@ -1,17 +1,21 @@
 package com.spring_rest_api.api_paths.entity;
 
+import java.util.*;
+
 public class User {
 
     public String name;
     public boolean isAdmin;
-    private UserAuthenticationInfo userAuthenticationInfo;
+    private Map<String, String> userAuthenticationInfo;
 
+    public User() {}
+   
 
-    public UserAuthenticationInfo getUserAuthenticationInfo() {
+    public Map<String, String> getUserAuthenticationInfo() {
         return userAuthenticationInfo;
     }
 
-    public void setUserAuthenticationInfo(UserAuthenticationInfo userAuthenticationInfo) {
+    public void setUserAuthenticationInfo(Map<String, String> userAuthenticationInfo) {
         this.userAuthenticationInfo = userAuthenticationInfo;
     }
 
