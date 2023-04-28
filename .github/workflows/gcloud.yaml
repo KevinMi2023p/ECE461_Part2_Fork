@@ -41,6 +41,6 @@ jobs:
       uses: google-github-actions/deploy-appengine@v1
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-      working_directory: api_paths
+      working-directory: api_paths
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
