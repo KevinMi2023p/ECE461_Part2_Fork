@@ -5,6 +5,7 @@ import com.spring_rest_api.api_paths.entity.Metadata;
 import com.spring_rest_api.api_paths.entity.Product;
 import com.spring_rest_api.api_paths.entity.encodedProduct;
 import com.spring_rest_api.api_paths.service.PackageService;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +50,7 @@ public class PackagesPostController {
         Product product = new Product();
         Data data = new Data();
         Metadata metadata = new Metadata();
+        int exists = 0;
 
         try (InputStream is = new ByteArrayInputStream(decodedBytes);
              ZipInputStream zis = new ZipInputStream(is)) {
@@ -57,24 +59,41 @@ public class PackagesPostController {
                 if (entry.getName().equals("package.json")) {
                     String jsonContent = IOUtils.toString(zis, "UTF-8");
                     JSONObject jsonObject = new JSONObject(jsonContent);
-                    String name = jsonObject.getString("name");
-                    String version = jsonObject.getString("version");
-                    data.setContent(encode.getContent());
-                    data.setJSProgram(encode.getJSProgram());
-                    metadata.setName(name);
-                    metadata.setVersion(version);
-                    metadata.setID(name + "-" + version);
-                    product.setData(data);
-                    product.setMetadata(metadata);
-                    break;
+                    try {
+                        String name = jsonObject.getString("name");
+                        String version = jsonObject.getString("version");
+//                        String URL = jsonObject.getString("URL");
+                        data.setContent(encode.getContent());
+                        data.setJSProgram(encode.getJSProgram());
+//                        data.setURL(URL);
+                        metadata.setName(name);
+                        metadata.setVersion(version);
+                        metadata.setID(name + "-" + version);
+                        product.setData(data);
+                        product.setMetadata(metadata);
+                        exists = 1;
+                        break;
+                    }
+                    catch (JSONException e){
+                        break;
+                    }
+
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(packageService.savePackage(product));
+        if(exists == 0){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.");
+        }
+        else{
+            String str = packageService.savePackage(product);
+            if(str == "Package exists already"){
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(packageService.savePackage(product));
+            }
+            return ResponseEntity.status(HttpStatus.CREATED).body(packageService.savePackage(product));
+        }
 
     }
 

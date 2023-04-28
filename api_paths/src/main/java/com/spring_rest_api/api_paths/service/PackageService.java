@@ -36,13 +36,8 @@ public class PackageService extends DbCollectionService {
 
         // overwrite previous value, if necessary
         if(docSs.exists()) {
-            String docUrl;
-            Map<String, Object> docData = docSs.getData();
 
-            if (docData != null && (docUrl = (String) docData.get("URL")) != null && !docUrl.equals(product.getData().getURL())) {
-                // if the current value should be updated
-                transactionPromise = docRef.set(product);
-            }
+            return "Package exists already";
         } else{
             // if there isn't a current value in the db
             transactionPromise = docRef.set(product);
