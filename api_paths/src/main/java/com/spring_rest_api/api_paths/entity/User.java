@@ -4,12 +4,11 @@ import java.util.*;
 
 public class User {
 
-    public String name;
-    public boolean isAdmin;
+    private String name;
+    private boolean isAdmin;
     private Map<String, String> userAuthenticationInfo;
 
     public User() {}
-   
 
     public Map<String, String> getUserAuthenticationInfo() {
         return userAuthenticationInfo;
@@ -19,7 +18,7 @@ public class User {
         this.userAuthenticationInfo = userAuthenticationInfo;
     }
 
-    public User(String name,boolean isAdmin) {
+    public User(String name, boolean isAdmin) {
         this.name = name;
         this.isAdmin = isAdmin;
     }
@@ -39,5 +38,4 @@ public class User {
     public void setAdmin(boolean admin) {
         isAdmin = admin;
     }
-
 }
