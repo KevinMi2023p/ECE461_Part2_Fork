@@ -4,12 +4,4 @@ entrypoint: 'java -jar target/ece461-part2.jar'
 
 env_variables:
   SPRING_PROFILES_ACTIVE: gcp
-
-handlers:
-- url: /.*
-  script: auto
-  secure: always
-
-- url: /favicon.ico
-  static_files: favicon.ico
-  upload: favicon.ico
+  GOOGLE_APPLICATION_CREDENTIALS: ${FIREBASE_CREDENTIALS}
