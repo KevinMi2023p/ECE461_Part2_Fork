@@ -94,7 +94,7 @@
             </plugin>
 
         </plugins>
-       
+       <finalName>ece461-part2</finalName>
     </build>
 
 </project>

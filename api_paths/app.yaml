@@ -1,6 +1,26 @@
 runtime: java11
 instance_class: F1
-entrypoint: 'java -jar target/your-app-name.jar'
 
 env_variables:
   SPRING_PROFILES_ACTIVE: gcp
+
+handlers:
+- url: /.*
+  script: auto
+  secure: always
+
+- url: /favicon.ico
+  static_files: favicon.ico
+  upload: favicon.ico
+
+# Run Maven to package the application as a JAR file
+- name: 'maven:3.8.3-openjdk-17'
+  entrypoint: 'mvn'
+  args: ['package']
+
+# Run the JAR file using the java command
+- name: 'java'
+  env_variables:
+    SPRING_PROFILES_ACTIVE: gcp
+  entrypoint: 'java'
+  args: ['-jar', 'target/ece461-part2.jar']
