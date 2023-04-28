@@ -7,12 +7,12 @@ import "fmt"
 import "io"
 import "os"
 
-import "github.com/anthony-pei/ECE461/cli/cmd"
+// import "github.com/Alethon/ECE461_Part2/cli/cmd"
 import log "github.com/sirupsen/logrus"
 
-import "github.com/anthony-pei/ECE461/cli/file_handler"
-import "github.com/anthony-pei/ECE461/cli/github_util"
-import "github.com/anthony-pei/ECE461/cli/metrics"
+import "github.com/Alethon/ECE461_Part2/cli/file_handler"
+import "github.com/Alethon/ECE461_Part2/cli/github_util"
+import "github.com/Alethon/ECE461_Part2/cli/metrics"
 
 /*
 #cgo LDFLAGS: -lstdc++ -lm
@@ -77,6 +77,6 @@ func logging_init() {
 
 func main() {
 	logging_init()
-	cmd.Execute()
+	// cmd.Execute()
 }
 

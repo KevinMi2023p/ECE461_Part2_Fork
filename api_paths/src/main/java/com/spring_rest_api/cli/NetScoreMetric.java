@@ -1,4 +1,4 @@
-package cli;
+package com.spring_rest_api.cli;
 
 public class NetScoreMetric {
     public float License;

@@ -3,6 +3,7 @@ package com.spring_rest_api.api_paths.service;
 import com.spring_rest_api.api_paths.entity.Product;
 
 import java.util.concurrent.ExecutionException;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -10,9 +11,6 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.WriteResult;
-import com.google.common.util.concurrent.ExecutionError;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.Gson;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +31,14 @@ public class PackageIdService {
         return (document.exists()) ? gson.toJson(document.getData()) : null;
     }
 
+    // Returns null if the document can't be found
+    public Map<String, Object> getPackageData(String id) throws ExecutionException, InterruptedException{
+        DocumentReference docRef = collectionReference.document(id);
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        DocumentSnapshot document = future.get();
+        return document.getData();
+    }
+
 
     // Returns true if document found has been deleted from Packages collection
     public boolean deletePackage(String id) throws ExecutionException, InterruptedException {
@@ -40,7 +46,7 @@ public class PackageIdService {
         DocumentSnapshot document = docRef.get().get();
         if (!document.exists()) {return false;}
         // Warning: Deleting a document does not delete its subcollections!
-        ApiFuture<WriteResult> writeRes = docRef.delete();
+        docRef.delete();
         return true;
     }
 

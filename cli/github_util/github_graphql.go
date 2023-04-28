@@ -5,7 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"os"
 
-	"github.com/anthony-pei/ECE461/cli/metrics"
+	"github.com/Alethon/ECE461_Part2/cli/metrics"
 	"github.com/hasura/go-graphql-client"
 	"golang.org/x/oauth2"
 )
