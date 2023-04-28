@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 public class ResetService {
-    private final String COLLECTION_NAME = "test1";
+    private final String COLLECTION_NAME = "Packages";
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
     private int batchSize = 1000;
 
