@@ -19,6 +19,11 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         project_id: ${{ secrets.GCP_PROJECT_ID }}
 
+    - name: Authenticate with Google Cloud
+      run: |-
+        echo "${{ secrets.GCP_SA_KEY }}" | gcloud auth activate-service-account --key-file=-
+        gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+
     - name: Deploy to App Engine
       uses: google-github-actions/deploy-appengine@v1
       with:
