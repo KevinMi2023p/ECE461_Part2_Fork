@@ -35,6 +35,7 @@ jobs:
       run: mvn package
       env:
         JAVA_HOME: ${{ env.JAVA_HOME }}
+      working_directory: api_paths
 
     - name: Deploy to App Engine
       uses: google-github-actions/deploy-appengine@v1
