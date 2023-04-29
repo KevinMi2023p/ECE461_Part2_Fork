@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { IAuthRequest } from './auth/IAuthRequest';
+import { IAuthenticationRequest } from './schemas/IAuthenticationRequest';
 import { HttpClient, HttpErrorResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { catchError, take } from 'rxjs';
+import { IAuthenticationToken } from './schemas/IAuthenticationToken';
 
 type HttpAnyResponse<T> = HttpResponse<T> | HttpErrorResponse;
 
@@ -12,37 +13,49 @@ type HttpAnyResponse<T> = HttpResponse<T> | HttpErrorResponse;
 })
 export class AppComponent implements OnInit {
     title = 'module-registry';
+
     public authToken: string;
+    public isAdmin: boolean;
 
     constructor(private http: HttpClient) {
-        this.getAuthToken();
-        console.log(this.authToken);
-    }
-
-    private getAuthToken(): void {
-        let token: string | null = sessionStorage.getItem('auth');
-        if (token) {
-            this.authToken = token;
-        } else {
-            this.authToken = "";
-        }
-    }
-
-    private setAuthToken(token: string): void {
-        sessionStorage.setItem('auth', token);
-    }
-
-    private unsetAuthToken(): void {
-        sessionStorage.removeItem('auth');
-        this.authToken = "";
+        this.getAuth();
+        console.log(this.isAdmin, this.authToken);
     }
 
     ngOnInit(): void {
-        this.setLoginOnClick();
-        this.setLogoutOnClick();
+        this.setupLogin();
+        this.setupLogout();
+        this.setupRegistryReset();
     }
 
-    private async setLoginOnClick(): Promise<void> {
+    private getAuth(): void {
+        let token: string | null = sessionStorage.getItem('auth');
+        let isAdmin: string | null = sessionStorage.getItem('isAdmin');
+        if (token && isAdmin) {
+            this.authToken = token;
+            this.isAdmin = (isAdmin == 'true');
+        } else {
+            this.authToken = "";
+            this.isAdmin = false;
+        }
+    }
+
+    private unsetAuth(): void {
+        sessionStorage.removeItem('auth');
+        sessionStorage.removeItem('isAdmin');
+        this.getAuth();
+    }
+
+    private setAuth(token: string, isAdmin: boolean): void {
+        this.unsetAuth();
+        if (token.length > 0) {
+            sessionStorage.setItem('auth', token);
+            sessionStorage.setItem('isAdmin', String(isAdmin));
+        }
+        this.getAuth();
+    }
+
+    private async setupLogin(): Promise<void> {
         let usernameInput: HTMLInputElement = document.getElementById("usernameInput") as HTMLInputElement;
         let passwordInput: HTMLInputElement = document.getElementById("passwordInput") as HTMLInputElement;
         let adminCheck: HTMLInputElement = document.getElementById("adminCheck") as HTMLInputElement;
@@ -54,7 +67,7 @@ export class AppComponent implements OnInit {
             passwordInput.disabled = true;
             adminCheck.disabled = true;
 
-            let authRequest: IAuthRequest = {
+            let authRequest: IAuthenticationRequest = {
                 User: {
                     name: usernameInput.value.trim(),
                     isAdmin: adminCheck.checked
@@ -64,9 +77,9 @@ export class AppComponent implements OnInit {
                 }
             };
 
-            let res: HttpAnyResponse<string> = await new Promise<HttpAnyResponse<string>>(
+            let res: HttpAnyResponse<IAuthenticationToken> = await new Promise<HttpAnyResponse<IAuthenticationToken>>(
                 (resolve) => {
-                    this.http.put<string>('/authenticate', authRequest, { observe: 'response',
+                    this.http.put<IAuthenticationToken>('/authenticate', authRequest, { observe: 'response',
                         withCredentials: false })
                     .pipe(take(1), catchError((error: HttpErrorResponse) => {
                         resolve(error);
@@ -75,14 +88,12 @@ export class AppComponent implements OnInit {
                 }
             );
 
-            let response: HttpResponse<string> | null = res as HttpResponse<string>;
+            let response: HttpResponse<IAuthenticationToken> | null = res as HttpResponse<IAuthenticationToken>;
             if (response && response.status == HttpStatusCode.Ok && response.body) {
-                this.setAuthToken(response.body);
+                this.setAuth(response.body, authRequest.User.isAdmin);
             } else {
                 console.log(res);
             }
-
-            this.getAuthToken();
 
             loginButton.disabled = false;
             usernameInput.disabled = false;
@@ -93,9 +104,41 @@ export class AppComponent implements OnInit {
         loginButton.disabled = false;
     }
 
-    private async setLogoutOnClick(): Promise<void> {
+    private async setupLogout(): Promise<void> {
         let logoutButton: HTMLButtonElement = document.getElementById("logoutButton") as HTMLButtonElement;
-        logoutButton.onclick = (event: MouseEvent) => this.unsetAuthToken();
+        logoutButton.onclick = (event: MouseEvent) => this.unsetAuth();
         logoutButton.disabled = false;
+    }
+
+    private async setupRegistryReset(): Promise<void> {
+        let resetRegistryButton: HTMLButtonElement = document.getElementById('resetRegistryButton') as HTMLButtonElement;
+
+        resetRegistryButton.onclick = async (event: MouseEvent) => {
+            resetRegistryButton.disabled = true;
+
+            this.getAuth();
+
+            let res: HttpAnyResponse<Object> = await new Promise<HttpAnyResponse<Object>>(
+                (resolve) => {
+                    this.http.delete('/reset', {
+                        observe: 'response',
+                        withCredentials: false,
+                        headers: { "X-Authorization": this.authToken }
+                    }).pipe(take(1), catchError((error: HttpErrorResponse) => {
+                        resolve(error);
+                        throw Error();
+                    })).forEach(v => resolve(v));
+                }
+            );
+
+            let response: HttpResponse<Object> | null = res as HttpResponse<Object>;
+            if (!response || response.status != HttpStatusCode.Ok) {
+                console.log(res);
+            }
+
+            resetRegistryButton.disabled = false;
+        };
+
+        resetRegistryButton.disabled = false;
     }
 }
