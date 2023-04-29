@@ -19,7 +19,6 @@ jobs:
         java-version: '17'
         distribution: 'adopt'
 
-
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1.1.0
       with:
@@ -30,6 +29,9 @@ jobs:
       uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Create firestore_credentials.json file
+      run: echo '${{ secrets.FIREBASE_CREDENTIALS }}' > api_paths/resources/firestore_credentials.json
 
     - name: Build JAR file
       run: mvn package
@@ -43,4 +45,4 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         working_directory: api_paths
       env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+        GOOGLE_APPLICATION_CREDENTIALS: api_paths/resources/firestore_credentials.json
