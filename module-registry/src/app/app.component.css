@@ -12,6 +12,10 @@ h1, h2, h3, h4, h5, h6 {
     margin: 8px 0;
 }
 
+.right-float {
+    float: right;
+}
+
 p {
     margin: 0;
 }
@@ -33,8 +37,21 @@ p {
     font-weight: 600;
 }
 
+.toolbar * {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
 .toolbar img {
-    margin: 0 16px;
+    margin: 0 1rem;
+}
+
+.lqrem {
+    margin-left: 0.25rem;
+}
+
+.rqrem {
+    margin-right: 0.25rem;
 }
 
 .content {
