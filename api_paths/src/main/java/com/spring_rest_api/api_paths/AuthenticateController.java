@@ -1,6 +1,7 @@
 package com.spring_rest_api.api_paths;
 
 import com.spring_rest_api.api_paths.entity.AuthenticationRequest;
+import com.spring_rest_api.api_paths.entity.Secret;
 import com.spring_rest_api.api_paths.entity.User;
 import com.spring_rest_api.api_paths.service.AuthenticateService;
 
@@ -24,7 +25,7 @@ public class AuthenticateController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AuthenticationRequest request) {
         try {
-            User registeredUser = userService.saveUser(request.getUser(), request.getUserAuthenticationInfo());
+            User registeredUser = userService.saveUser(request.getUser(), request.getSecret());
             if (registeredUser != null) {
                 return ResponseEntity.ok(registeredUser);
             } else {
@@ -34,15 +35,14 @@ public class AuthenticateController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error registering the user.");
         }
     }
-    
 
     @PutMapping("/authenticate")
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request) {
         logger.info("User: {}", request.getUser());
-        logger.info("UserAuthenticationInfo: {}", request.getUserAuthenticationInfo());
+        logger.info("Secret: {}", request.getSecret());
         String token;
         try {
-            token = userService.authenticateUser(request.getUser(), request.getUserAuthenticationInfo());
+            token = userService.authenticateUser(request.getUser(), request.getSecret());
         } catch (ExecutionException | InterruptedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Authentication failed.");
         } catch (IllegalArgumentException e) {
@@ -67,4 +67,8 @@ public class AuthenticateController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing the user.");
         }
     }
+
+    // The following is for the reset functionality:
+
+    
 }
