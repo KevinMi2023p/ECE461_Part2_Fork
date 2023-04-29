@@ -38,12 +38,10 @@ public class PackageIdController {
     AuthenticateService authenticateService;
 
     @GetMapping("/package/{id}")
-    public ResponseEntity<String> packageId(@PathVariable String id ,  @RequestHeader("Authorization") String token) throws ExecutionException, InterruptedException {
-        logger.info("Received token: {}", token);
-        System.out.println("Token: " + token);
+    public ResponseEntity<String> packageId(@PathVariable String id ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
         if (!validateToken(token)) {
             logger.info("Token sent by User: {}", token);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
 
         }
         String document_string = packageIdService.getPackage(id);
@@ -51,7 +49,12 @@ public class PackageIdController {
     }
 
     @PutMapping("/package/{id}")
-    public ResponseEntity<String> putMethodName(@PathVariable String id, @RequestBody Product product) throws ExecutionException, InterruptedException {
+    public ResponseEntity<String> putMethodName(@PathVariable String id, @RequestBody Product product ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
+        if (!validateToken(token)) {
+            logger.info("Token sent by User: {}", token);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
+
+        }
         String old_document_string = packageIdService.getPackage(id);
         if (old_document_string == null)
             return notFoundError;
@@ -70,7 +73,12 @@ public class PackageIdController {
     }
 
     @DeleteMapping("/package/{id}")
-    public ResponseEntity<String> deleteMethodName(@PathVariable String id) throws ExecutionException, InterruptedException {
+    public ResponseEntity<String> deleteMethodName(@PathVariable String id ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
+        if (!validateToken(token)) {
+            logger.info("Token sent by User: {}", token);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
+
+        }
         boolean deletedDoc = packageIdService.deletePackage(id);
         String delMsg = "Package is deleted.";
         return (deletedDoc == false) ? notFoundError : ResponseEntity.status(HttpStatus.OK).body(delMsg);
