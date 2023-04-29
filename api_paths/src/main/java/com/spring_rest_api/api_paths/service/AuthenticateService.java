@@ -7,6 +7,8 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.spring_rest_api.api_paths.entity.Secret;
 import com.spring_rest_api.api_paths.entity.User;
+
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 @Service
+@DependsOn("firestoreInitialization")
 public class AuthenticateService {
     private static final String COLLECTION_NAME = "Users";
     private static final String JWT_SECRET = "GIyoqsMwGPv2YEStDNat1qaXXbOH8lmwkvbUODyzoF8="; // Replace with your own secret
@@ -220,7 +223,8 @@ public class AuthenticateService {
     }
 
     // The following is for default username and secret
-    //@PostConstruct
+    @PostConstruct
+    @DependsOn("firestoreInitialization")
     public void createDefaultUser() {
         String defaultUsername = "admin";
         String defaultPassword = "admin";
