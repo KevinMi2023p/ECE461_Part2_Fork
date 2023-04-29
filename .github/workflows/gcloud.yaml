@@ -33,6 +33,9 @@ jobs:
     - name: Create firestore_credentials.json file
       run: echo '${{ secrets.FIREBASE_CREDENTIALS }}' > api_paths/src/main/resources/firestore_credentials.json
 
+    - name: Set file permissions for credentials file
+      run: chmod 644 api_paths/src/main/resources/firestore_credentials.json
+
     - name: Build JAR file
       run: mvn package
       working-directory: api_paths
@@ -45,5 +48,5 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         working_directory: api_paths
         env_vars:
-          GOOGLE_APPLICATION_CREDENTIALS=api_paths/src/main/resources/firestore_credentials.json
+          GOOGLE_APPLICATION_CREDENTIALS=/src/main/resources/firestore_credentials.json
 
