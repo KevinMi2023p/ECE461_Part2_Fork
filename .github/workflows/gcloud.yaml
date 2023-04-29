@@ -45,4 +45,5 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         working_directory: api_paths
         env_vars:
-          GOOGLE_APPLICATION_CREDENTIALS=${{ secrets.FIREBASE_CREDENTIALS }}
+          GOOGLE_APPLICATION_CREDENTIALS=api_paths/src/main/resources/firestore_credentials.json
+
