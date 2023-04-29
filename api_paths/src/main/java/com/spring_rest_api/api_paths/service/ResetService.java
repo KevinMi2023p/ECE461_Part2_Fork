@@ -1,66 +1,49 @@
 package com.spring_rest_api.api_paths.service;
 
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.firebase.cloud.FirestoreClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.concurrent.ExecutionException;
+
 import org.springframework.stereotype.Service;
+
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.firebase.cloud.FirestoreClient;
+
+import java.util.List;
 
 @Service
 public class ResetService {
-    private static final String USER_COLLECTION_NAME = "users";
-    private static final String PACKAGE_COLLECTION_NAME = "packages";
-    private static final Logger logger = LoggerFactory.getLogger(ResetService.class);
+    private final String COLLECTION_NAME = "Packages";
+    private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
+    private int batchSize = 1000;
 
-    @Autowired
-    AuthenticateService authenticateService;
 
-    public void resetAll() {
-        deleteAllUsers();
-        deleteAllPackages();
-        authenticateService.createDefaultUser();
-    }
-
-    private void deleteAllUsers() {
-        Firestore dbFirestore = FirestoreClient.getFirestore();
+    /**
+     * Delete a collection in batches to avoid out-of-memory errors. Batch size may be tuned based on
+     * document size (atmost 1MB) and application requirements.
+     */
+    public boolean clearCollection() throws ExecutionException, InterruptedException {
+        boolean result = true;
+        // int numberOfPackages = collectionReference.get().
         try {
-            dbFirestore.collection(USER_COLLECTION_NAME).listDocuments().forEach(docRef -> {
-                try {
-                    ApiFuture<DocumentSnapshot> document = docRef.get();
-                    DocumentSnapshot doc = document.get();
-                    if (doc.exists()) {
-                        docRef.delete();
-                    }
-                } catch (Exception e) {
-                    logger.error("Error deleting user: {}", e.getMessage());
-                }
-            });
-            logger.info("All users deleted.");
+            ApiFuture<QuerySnapshot> future = collectionReference.limit(this.batchSize).get();
+            int deleted = 0;
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            for (QueryDocumentSnapshot document : documents) {
+                document.getReference().delete();
+                deleted += 1;
+            }
+            if (deleted >= batchSize) {
+                // retrieve and delete another batch
+                result &= clearCollection();
+            }
         } catch (Exception e) {
-            logger.error("Error deleting all users: {}", e.getMessage());
+            System.err.println("Error deleting collection : " + e.getMessage());
+            result = false;
         }
+
+        return result;
     }
 
-    private void deleteAllPackages() {
-        Firestore dbFirestore = FirestoreClient.getFirestore();
-        try {
-            dbFirestore.collection(PACKAGE_COLLECTION_NAME).listDocuments().forEach(docRef -> {
-                try {
-                    ApiFuture<DocumentSnapshot> document = docRef.get();
-                    DocumentSnapshot doc = document.get();
-                    if (doc.exists()) {
-                        docRef.delete();
-                    }
-                } catch (Exception e) {
-                    logger.error("Error deleting package: {}", e.getMessage());
-                }
-            });
-            logger.info("All packages deleted.");
-        } catch (Exception e) {
-            logger.error("Error deleting all packages: {}", e.getMessage());
-        }
-    }
 }

@@ -4,8 +4,8 @@ ARG API_KEY_ARG
 # https://hub.docker.com/_/maven
 FROM maven:3.8.3-openjdk-17-slim AS build
 
-# Copy ./libpackageanalyze.so to /usr/lib/
-COPY ./libpackageanalyze.so /usr/lib/libpackageanalyze.so
+# Copy ./cli/libpackageanalyze.so to /usr/lib/
+COPY ./cli/libpackageanalyze.so /usr/lib/libpackageanalyze.so
 
 # Copy ./libNetScoreUtil.so to /usr/lib/
 COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so

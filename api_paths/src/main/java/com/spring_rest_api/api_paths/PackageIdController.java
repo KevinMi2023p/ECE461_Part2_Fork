@@ -85,11 +85,11 @@ public class PackageIdController {
     }
 
     private boolean validateToken(String token) {
-    try {
-        return authenticateService.validateJwtToken(token);
-    } catch (Exception e) {
-        return false;
-    }
+        try {
+            return authenticateService.validateJwtToken(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }
