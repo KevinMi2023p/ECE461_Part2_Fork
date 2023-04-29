@@ -159,7 +159,8 @@ export class AppComponent implements OnInit {
                 {
                     observe: 'response',
                     withCredentials: false,
-                    params: params
+                    params: params,
+                    headers: { "X-Authorization": this.authToken }
                 }).pipe(take(1), catchError((error: HttpErrorResponse) => {
                     resolve(error);
                     throw Error();
