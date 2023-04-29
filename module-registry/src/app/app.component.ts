@@ -3,6 +3,10 @@ import { IAuthenticationRequest } from './schemas/IAuthenticationRequest';
 import { HttpClient, HttpErrorResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { catchError, take } from 'rxjs';
 import { IAuthenticationToken } from './schemas/IAuthenticationToken';
+import { IPackageMetadata } from './schemas/IPackageMetadata';
+import { IPackageQuery } from './schemas/IPackageQuery';
+import { IEnumerateOffset } from './schemas/IEnumerateOffset';
+import { IPackagesResult } from './interfaces/IPackagesResult';
 
 type HttpAnyResponse<T> = HttpResponse<T> | HttpErrorResponse;
 
@@ -61,6 +65,7 @@ export class AppComponent implements OnInit {
         let adminCheck: HTMLInputElement = document.getElementById("adminCheck") as HTMLInputElement;
 
         let loginButton: HTMLButtonElement = document.getElementById("loginButton") as HTMLButtonElement;
+
         loginButton.onclick = async (event: MouseEvent) => {
             loginButton.disabled = true;
             usernameInput.disabled = true;
@@ -140,5 +145,39 @@ export class AppComponent implements OnInit {
         };
 
         resetRegistryButton.disabled = false;
+    }
+
+    private async packagesRequest(packageQueries: IPackageQuery[], offset: IEnumerateOffset | null): Promise<IPackagesResult | null> {
+        let params: { [param: string]: string | number | boolean | ReadonlyArray<string | number | boolean>; } = {};
+        if (offset) {
+            params["offset"] = offset;
+        }
+
+        let res: HttpAnyResponse<IPackageMetadata[]> = await new Promise<HttpAnyResponse<IPackageMetadata[]>>(
+            (resolve) => {
+                this.http.post<IPackageMetadata[]>('/packages', packageQueries,
+                {
+                    observe: 'response',
+                    withCredentials: false,
+                    params: params
+                }).pipe(take(1), catchError((error: HttpErrorResponse) => {
+                    resolve(error);
+                    throw Error();
+                })).forEach(v => resolve(v));
+            }
+        );
+
+        let response: HttpResponse<IPackageMetadata[]> | null = res as HttpResponse<IPackageMetadata[]>;
+
+        if (response && response.status == HttpStatusCode.Ok && response.body) {
+            return {
+                metadatas: response.body,
+                offset: response.headers.get('offset')
+            };
+        } else {
+            console.log(res);
+        }
+
+        return null;
     }
 }
