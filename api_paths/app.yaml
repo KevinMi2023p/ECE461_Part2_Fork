@@ -2,6 +2,3 @@ runtime: java17
 instance_class: F1
 entrypoint: 'java -jar target/ece461-part2.jar'
 
-env_variables:
-  SPRING_PROFILES_ACTIVE: gcp
-  GOOGLE_APPLICATION_CREDENTIALS: ${FIREBASE_CREDENTIALS}
