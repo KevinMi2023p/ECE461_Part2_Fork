@@ -37,7 +37,7 @@ public class PackageIdController {
     @Autowired
     AuthenticateService authenticateService;
 
-    @GetMapping("/package/{id}")
+    @GetMapping(value = "/package/{id}", produces = "application/json")
     public ResponseEntity<String> packageId(@PathVariable String id ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
         if (!validateToken(token)) {
             logger.info("Token sent by User: {}", token);
