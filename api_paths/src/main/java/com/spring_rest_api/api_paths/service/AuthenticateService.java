@@ -30,35 +30,35 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 @DependsOn("firestoreInitialization")
 public class AuthenticateService {
     private static final String COLLECTION_NAME = "Users";
-    private static final String JWT_SECRET = "GIyoqsMwGPv2YEStDNat1qaXXbOH8lmwkvbUODyzoF8="; // Replace with your own secret
+    private static final String JWT_SECRET = "GIyoqsMwGPv2YEStDNat1qaXXbOH8lmwkvbUODyzoF8="; // Replace with your own Secret
     private static final long EXPIRATION_TIME = 36000000; // 1 day in milliseconds
     private static final String TOKEN_USAGE_COLLECTION_NAME = "TokenUsage";
     private static final long MAX_TOKEN_USAGE = 1000;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticateService.class);
 
-    public User saveUser(User user,Secret secret) throws ExecutionException, InterruptedException {
+    public User saveUser(User User,Secret Secret) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        DocumentReference docRef = dbFirestore.collection(COLLECTION_NAME).document(user.getName());
+        DocumentReference docRef = dbFirestore.collection(COLLECTION_NAME).document(User.getName());
         ApiFuture<DocumentSnapshot> document = docRef.get();
         DocumentSnapshot doc = document.get();
     
-        logger.info("Checking if user {} exists in Firestore", user.getName());
+        logger.info("Checking if User {} exists in Firestore", User.getName());
         
         if (doc.exists()) {
-            logger.warn("User already exists: {}", user.getName());
-            logger.warn("Document data for user {}: {}", user.getName(), doc.getData());
+            logger.warn("User already exists: {}", User.getName());
+            logger.warn("Document data for User {}: {}", User.getName(), doc.getData());
             return null; // User already exists
         } else {
-            // Set the authentication info to the user object
-            user.setUserAuthenticationInfo(new HashMap<String, String>() {{
-                put("password", secret.getPassword());
+            // Set the authentication info to the User object
+            User.setUserAuthenticationInfo(new HashMap<String, String>() {{
+                put("password", Secret.getPassword());
             }});
-            logger.info("Saving Secret: {}", secret); // Add this log statement
+            logger.info("Saving Secret: {}", Secret); // Add this log statement
     
-            ApiFuture<WriteResult> collectionApiFuture = dbFirestore.collection(COLLECTION_NAME).document(user.getName()).set(user);
-            logger.info("User saved: {}", user.getName());
-            return user; // Successfully saved user
+            ApiFuture<WriteResult> collectionApiFuture = dbFirestore.collection(COLLECTION_NAME).document(User.getName()).set(User);
+            logger.info("User saved: {}", User.getName());
+            return User; // Successfully saved User
         }
     }
     
@@ -79,9 +79,9 @@ public class AuthenticateService {
     }
 
 
-    public String authenticateUser(User user, Secret secret) throws ExecutionException, InterruptedException, UnsupportedEncodingException {
+    public String authenticateUser(User User, Secret Secret) throws ExecutionException, InterruptedException, UnsupportedEncodingException {
         Firestore dbfirestore = FirestoreClient.getFirestore();
-        DocumentReference docRef = dbfirestore.collection(COLLECTION_NAME).document(user.getName());
+        DocumentReference docRef = dbfirestore.collection(COLLECTION_NAME).document(User.getName());
         ApiFuture<DocumentSnapshot> document = docRef.get();
         DocumentSnapshot doc = document.get();
     
@@ -91,11 +91,11 @@ public class AuthenticateService {
             storedPassword = storedAuthInfo.get("password");
             logger.info("Stored UserAuthenticationInfo: {}", storedAuthInfo);
             logger.info("Stored password: {}", storedPassword);
-            logger.info("Provided password: {}", secret.getPassword());
+            logger.info("Provided password: {}", Secret.getPassword());
     
-            if (secret.getPassword().equals(storedPassword)) {
-                String token = generateJwtToken(user.getName());
-                storeTokenUsage(token, user.getName()); // Pass the username as a parameter
+            if (Secret.getPassword().equals(storedPassword)) {
+                String token = generateJwtToken(User.getName());
+                storeTokenUsage(token, User.getName()); // Pass the username as a parameter
                 return token;
             } else {
                 throw new IllegalArgumentException("Invalid password.");
@@ -124,7 +124,7 @@ public class AuthenticateService {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         CollectionReference tokenUsageCollection = dbFirestore.collection(TOKEN_USAGE_COLLECTION_NAME);
     
-        // Find the existing token entry for the user
+        // Find the existing token entry for the User
         Query query = tokenUsageCollection.whereEqualTo("username", username);
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
         List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
@@ -222,7 +222,7 @@ public class AuthenticateService {
         }
     }
 
-    // The following is for default username and secret
+    // The following is for default username and Secret
     // @PostConstruct
     // @DependsOn("firestoreInitialization")
     public void createDefaultUser() {
@@ -231,14 +231,14 @@ public class AuthenticateService {
         boolean defaultIsAdmin = true;
 
         try {
-            // Check if the default user already exists
+            // Check if the default User already exists
             Firestore dbFirestore = FirestoreClient.getFirestore();
             DocumentReference docRef = dbFirestore.collection(COLLECTION_NAME).document(defaultUsername);
             ApiFuture<DocumentSnapshot> document = docRef.get();
             DocumentSnapshot doc = document.get();
 
             if (!doc.exists()) {
-                // Create a new user with the specified username and password
+                // Create a new User with the specified username and password
                 User defaultUser = new User();
                 defaultUser.setName(defaultUsername);
 
@@ -248,12 +248,12 @@ public class AuthenticateService {
                 defaultUser.setIsAdmin(defaultIsAdmin);
 
                 saveUser(defaultUser, userSecret);
-                logger.info("Default user created: {}", defaultUsername);
+                logger.info("Default User created: {}", defaultUsername);
             } else {
-                logger.info("Default user already exists: {}", defaultUsername);
+                logger.info("Default User already exists: {}", defaultUsername);
             }
         } catch (ExecutionException | InterruptedException e) {
-            logger.error("Error creating default user: {}", e.getMessage());
+            logger.error("Error creating default User: {}", e.getMessage());
         }
     }
 

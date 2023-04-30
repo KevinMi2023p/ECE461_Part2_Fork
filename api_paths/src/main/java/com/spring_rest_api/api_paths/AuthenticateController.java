@@ -34,6 +34,7 @@ public class AuthenticateController {
         } catch (ExecutionException | InterruptedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error registering the user.");
         }
+       
     }
 
     @PutMapping("/authenticate")
