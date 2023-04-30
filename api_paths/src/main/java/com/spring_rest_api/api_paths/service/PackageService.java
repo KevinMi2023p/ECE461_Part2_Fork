@@ -5,12 +5,16 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.internal.NonNull;
 import com.google.gson.Gson;
 import com.spring_rest_api.api_paths.entity.Product;
+
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 
 import java.util.concurrent.ExecutionException;
 
 @Service
+
+@DependsOn("firestoreInitialization")
 public class PackageService extends DbCollectionService {
     @NonNull
     private static final String COLLECTION_NAME = "Packages";
