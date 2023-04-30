@@ -57,6 +57,7 @@
             <artifactId>spring-security-config</artifactId>
         </dependency>
 
+
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
@@ -69,10 +70,41 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <release>17</release>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.spring_rest_api.api_paths.ApiPathsApplication</mainClass>
+                    <layout>JAR</layout>
+                    <environmentVariables>
+                        <GOOGLE_APPLICATION_CREDENTIALS>api_paths/src/main/resources/firestore_credentials.json</GOOGLE_APPLICATION_CREDENTIALS>
+                    </environmentVariables>
+                </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <repositoryId>repo</repositoryId>
+                    <url>https://my.repo.com</url>
+                    <repositoryLayout>default</repositoryLayout>
+                    <session>${repositorySystemSession}</session>
+                </configuration>
+            </plugin>
+            <!-- <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>appengine-maven-plugin</artifactId>
+                <version>2.4.0</version>
+            </plugin> -->
+
         </plugins>
+       <finalName>ece461-part2</finalName>
     </build>
 
 </project>
