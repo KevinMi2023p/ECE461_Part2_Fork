@@ -19,7 +19,6 @@ jobs:
         java-version: '17'
         distribution: 'adopt'
 
-
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1.1.0
       with:
@@ -42,5 +41,5 @@ jobs:
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         working_directory: api_paths
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+        credentials: ${{ secrets.GCP_SA_KEY }}
+

@@ -2,8 +2,11 @@ package com.spring_rest_api.api_paths.entity;
 
 import java.util.*;
 
-public class User {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+public class User {
+    
+    @JsonProperty("name")
     private String name;
     private boolean isAdmin;
     private Map<String, String> userAuthenticationInfo;
@@ -39,8 +42,5 @@ public class User {
         this.isAdmin = admin;
     }
 
-    public boolean getAdmin(){
-        return isAdmin;
-    }
 
 }

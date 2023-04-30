@@ -1,23 +1,27 @@
 package com.spring_rest_api.api_paths.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class AuthenticationRequest {
 
-    private User user;
-    private Secret secret;
+    @JsonProperty("User")
+    private User User;
+    @JsonProperty("Secret")
+    private Secret Secret;
 
     public User getUser() {
-        return user;
+        return User;
     }
 
     public void setUser(User user) {
-        this.user = user;
+        this.User = user;
     }
 
     public Secret getSecret() {
-        return secret;
+        return Secret;
     }
 
     public void setSecret(Secret secret) {
-        this.secret = secret;
+        this.Secret = secret;
     }
 }
