@@ -4,6 +4,9 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import javax.annotation.Nonnull;
 
+import org.springframework.context.annotation.DependsOn;
+
+@DependsOn("firestoreInitialization")
 public abstract class DbCollectionService {
     protected final Firestore dbFirestore;
     protected final CollectionReference collectionRef;

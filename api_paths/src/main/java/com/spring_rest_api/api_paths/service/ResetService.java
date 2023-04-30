@@ -2,6 +2,7 @@ package com.spring_rest_api.api_paths.service;
 
 import java.util.concurrent.ExecutionException;
 
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import com.google.api.core.ApiFuture;
@@ -13,6 +14,8 @@ import com.google.firebase.cloud.FirestoreClient;
 import java.util.List;
 
 @Service
+
+@DependsOn("firestoreInitialization")
 public class ResetService {
     private final String COLLECTION_NAME = "Packages";
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);

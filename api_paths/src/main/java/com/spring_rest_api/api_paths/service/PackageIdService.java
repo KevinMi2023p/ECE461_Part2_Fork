@@ -17,8 +17,10 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.Gson;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.annotation.DependsOn;
 
 @Service
+@DependsOn("firestoreInitialization")
 public class PackageIdService {
     private final String COLLECTION_NAME = "Packages";
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
