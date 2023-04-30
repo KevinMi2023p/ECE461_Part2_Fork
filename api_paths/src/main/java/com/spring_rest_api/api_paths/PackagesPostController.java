@@ -46,6 +46,13 @@ public class PackagesPostController {
     @PostMapping("/package")
     public ResponseEntity<String> package_single(@RequestBody encodedProduct encode) throws ExecutionException, InterruptedException {
         //packageService.savePackage(product);
+
+        if(encode.getContent() != null && encode.getURL() != null ){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.");
+        }
+        if(encode.getContent() == null && encode.getURL() != null){
+            // The url should be rated here
+        }
         byte[] decodedBytes = Base64.getDecoder().decode(encode.getContent());
         Product product = new Product();
         Data data = new Data();
@@ -90,9 +97,9 @@ public class PackagesPostController {
         else{
             String str = packageService.savePackage(product);
             if(str == "Package exists already"){
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(packageService.savePackage(product));
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(str);
             }
-            return ResponseEntity.status(HttpStatus.CREATED).body(packageService.savePackage(product));
+            return ResponseEntity.status(HttpStatus.CREATED).body(str);
         }
 
     }

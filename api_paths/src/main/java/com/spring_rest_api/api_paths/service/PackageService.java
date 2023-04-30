@@ -3,6 +3,7 @@ package com.spring_rest_api.api_paths.service;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.internal.NonNull;
+import com.google.gson.Gson;
 import com.spring_rest_api.api_paths.entity.Product;
 import org.springframework.stereotype.Service;
 import java.util.Map;
@@ -25,19 +26,27 @@ public class PackageService extends DbCollectionService {
 
     // We will write code here that will be called in the contollers to send data to the db
     public String savePackage(Product product) throws ExecutionException, InterruptedException {
+
+        Gson gson = new Gson();
+
         // get document reference
         DocumentReference docRef = this.collectionRef.document(product.getMetadata().getID());
 
         // get snapshot of document reference
         DocumentSnapshot docSs = docRef.get().get();
 
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        DocumentSnapshot document = future.get();
+
+        if(document.exists()){
+            return "Package exists already";
+        }
         // collection write result
         ApiFuture<WriteResult> transactionPromise = null;
 
         // overwrite previous value, if necessary
         if(docSs.exists()) {
 
-            return "Package exists already";
         } else{
             // if there isn't a current value in the db
             transactionPromise = docRef.set(product);
@@ -52,7 +61,7 @@ public class PackageService extends DbCollectionService {
         }
 
         // return string form of current metadata value
-        return docSs.getData().toString();
+        return gson.toJson(docSs.getData());
     }
 }
     
