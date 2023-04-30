@@ -65,8 +65,14 @@ jobs:
         docker run --rm -d -p 8080:8080 --name my-docker-container -v ${PWD}/api_paths/src/main/resources/application.properties:/app/resources/application.properties my-docker-image
         sleep 30
 
+    - name: Get container ID
+      run: |
+        container_id=$(docker ps -aqf "name=my-docker-container")
+        echo "container_id=$container_id" >> $GITHUB_ENV
+        
     - name: Print Docker container logs
-      run: docker logs my-docker-container
+      run: docker logs ${{ env.container_id }}
+
 
     - name: Verify Spring Boot application
       run: |
