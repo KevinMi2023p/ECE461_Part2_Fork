@@ -8,6 +8,8 @@ FROM maven:3.8.3-openjdk-17-slim AS build
 # # Copy ./libNetScoreUtil.so to /usr/lib/
 # COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
+EXPOSE 8080
+
 WORKDIR /app
 COPY . /app
 RUN mvn -f /app/api_paths/pom.xml clean package
