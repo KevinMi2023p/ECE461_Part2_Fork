@@ -1,24 +1,26 @@
 <!-- Toolbar -->
 <div class="toolbar" role="banner">
-    <img
+    <!-- <img
         width="40"
         alt="Angular Logo"
         src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg=="
-    />
-    <label [hidden]="authToken == undefined || authToken.length > 0" for="username" class="lqrem rqrem">Username</label>
+    /> -->
+    <label [hidden]="authToken == undefined || authToken.length > 0" for="username" class="rqrem right-float">Username</label>
     <input [hidden]="authToken == undefined || authToken.length > 0" type="text" id="usernameInput" name="username" class="rqrem">
     <label [hidden]="authToken == undefined || authToken.length > 0" for="password" class="lqrem">Password</label>
     <input [hidden]="authToken == undefined || authToken.length > 0" type="text" id="passwordInput" name="password" class="lqrem rqrem">
     <label [hidden]="authToken == undefined || authToken.length > 0" for="adminCheck" class="lqrem">Admin</label>
     <input [hidden]="authToken == undefined || authToken.length > 0" type="checkbox" id="adminCheck" name="adminCheck" value="isAdmin" class="rqrem">
     <input [hidden]="authToken == undefined || authToken.length > 0" type="submit" value="Login" class="lqrem rqrem" id="loginButton" disabled>
-    <button [hidden]="authToken == undefined || authToken.length == 0" class="lqrem rqrem" id="logoutButton" disabled>Logout</button>
+    <button [hidden]="authToken == undefined || authToken.length == 0" class="rqrem right-float" id="logoutButton" disabled>Logout</button>
 </div>
 
 <div class="content" role="main">
+    <table id="metadataTable">
+    </table>
     <button [disabled]="isAdmin == undefined || !isAdmin" class="lqrem rqrem" id="resetRegistryButton" disabled>Reset Registry</button>
 
-    <!-- Next Steps -->
+    <!-- Next Steps
     <h2>Next Steps</h2>
     <p>What do you want to do next with your app?</p>
 
@@ -56,7 +58,7 @@
         </button>
     </div>
 
-    <!-- Terminal -->
+    Terminal
     <div class="terminal" [ngSwitch]="selection.value">
         <pre *ngSwitchDefault>ng generate component xyz</pre>
         <pre *ngSwitchCase="'material'">ng add @angular/material</pre>
@@ -64,6 +66,6 @@
         <pre *ngSwitchCase="'dependency'">ng add _____</pre>
         <pre *ngSwitchCase="'test'">ng test</pre>
         <pre *ngSwitchCase="'build'">ng build</pre>
-    </div>
+    </div> -->
 
 </div>

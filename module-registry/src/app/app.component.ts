@@ -27,6 +27,8 @@ export class AppComponent implements OnInit {
     public authToken: string;
     public isAdmin: boolean;
 
+    public metadataTable: HTMLTableElement;
+
     constructor(private http: HttpClient) {
         this.getAuth();
         console.log(this.isAdmin, this.authToken);
@@ -36,7 +38,7 @@ export class AppComponent implements OnInit {
         this.setupLogin();
         this.setupLogout();
         this.setupRegistryReset();
-        this.packageIdGetRequest("test");
+        this.setupMetadataTable();
     }
 
     private getAuth(): void {
@@ -117,6 +119,10 @@ export class AppComponent implements OnInit {
         };
 
         resetRegistryButton.disabled = false;
+    }
+
+    private async setupMetadataTable(): Promise<void> {
+        this.metadataTable = document.getElementById('metadataTable') as HTMLTableElement;
     }
 
     // generic *Request methods
