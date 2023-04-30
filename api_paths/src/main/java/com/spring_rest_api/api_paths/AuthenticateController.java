@@ -37,7 +37,7 @@ public class AuthenticateController {
        
     }
 
-    @PutMapping("/authenticate")
+    @PutMapping(value = "/authenticate", produces = "application/json")
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request) {
         logger.info("User: {}", request.getUser());
         logger.info("Secret: {}", request.getSecret());
