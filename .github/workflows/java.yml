@@ -55,13 +55,22 @@ jobs:
       run: mvn package
       working-directory: api_paths
     
+    - name: Run Spring Boot application
+      run: |
+        java -Djava.security.egd=file:/dev/./urandom -jar api_paths/target/*.jar &
+        sleep 30
+
+    - name: Test Spring Boot application
+      run: curl http://localhost:8080/
+
     - name: Docker login
       run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
 
     - name: Build for Docker
       run: |
-        docker build -t my-docker-image --build-arg API_KEY=$API_KEY .
+        docker build --no-cache -t my-docker-image --build-arg API_KEY=$API_KEY .
+        docker images
         docker run --rm -d -p 8080:8080 --name my-docker-container -v ${PWD}/api_paths/src/main/resources/application.properties:/app/resources/application.properties my-docker-image
         sleep 30
 
