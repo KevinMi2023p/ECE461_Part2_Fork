@@ -71,7 +71,14 @@ jobs:
         echo "container_id=$container_id" >> $GITHUB_ENV
         
     - name: Print Docker container logs
-      run: docker logs ${{ env.container_id }}
+      run: |
+        container_id=$(docker ps -aqf "name=my-docker-container")
+        if [ -n "$container_id" ]; then
+          docker logs $container_id
+        else
+          echo "Container 'my-docker-container' not found or has exited early."
+        fi
+
 
 
     - name: Verify Spring Boot application
