@@ -57,8 +57,11 @@ jobs:
     
     - name: Run Spring Boot application
       run: |
-        java -Djava.security.egd=file:/dev/./urandom -DGOOGLE_APPLICATION_CREDENTIALS=$PWD/accountKey.json -jar api_paths/target/*.jar &
+        java -Djava.security.egd=file:/dev/./urandom -jar api_paths/target/*.jar &
         sleep 30
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/accountKey.json
+
 
     - name: Test Spring Boot application
       run: curl http://localhost:8080/
