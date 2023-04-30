@@ -26,7 +26,7 @@ public class PackageByNameController {
     @Autowired
     AuthenticateService authenticateService;
     
-	@GetMapping("/package/byName/{name}")
+	@GetMapping(value="/package/byName/{name}", produces = "application/json")
 	public ResponseEntity<String> packageByName(@PathVariable String name , @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
         if (!validateToken(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -38,7 +38,7 @@ public class PackageByNameController {
         return (result == null) ? notFoundError : ResponseEntity.ok().body(result);
 	}
 
-    @DeleteMapping("/package/byName/{name}")
+    @DeleteMapping(value = "/package/byName/{name}")
     public ResponseEntity<String> deleteMethodName(@PathVariable String name , @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
         if (!validateToken(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
