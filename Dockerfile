@@ -2,18 +2,19 @@
 # https://hub.docker.com/_/maven
 FROM maven:3.8.3-openjdk-17-slim AS build
 
-# Copy the native libraries to the build stage
+# Copy ./cli/libpackageanalyze.so to /usr/lib/
 COPY ./cli/libpackageanalyze.so /usr/lib/libpackageanalyze.so
+
+# Copy ./libNetScoreUtil.so to /usr/lib/
 COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
-# Set the working directory and copy your project files
+
+
 WORKDIR /app
 COPY . /app
+RUN mvn -f /app/api_paths/pom.xml clean package
 
-# Build the project with Maven
-RUN mvn -f /app/pom.xml clean package
-
-# Use AdoptOpenJDK for the base image.
+# Use AdoptOpenJDK for base image.
 # https://hub.docker.com/_/adoptopenjdk
 FROM eclipse-temurin:17-jdk-alpine
 
@@ -23,11 +24,10 @@ ARG API_KEY
 # Set the API_KEY environment variable
 ENV API_KEY=${API_KEY}
 
-# Expose the port your Spring Boot app is running on
 EXPOSE 8080
 
 # Copy the jar to the production image from the build stage.
-COPY --from=build /app/target/*.jar /app/app.jar
+COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
 
 # Run the web service on container startup.
 CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]
