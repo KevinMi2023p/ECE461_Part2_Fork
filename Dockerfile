@@ -16,7 +16,7 @@ RUN mvn -f /app/api_paths/pom.xml clean package
 
 # Use AdoptOpenJDK for base image.
 # https://hub.docker.com/_/adoptopenjdk
-FROM adoptopenjdk:17-jdk-openj9-alpine
+FROM eclipse-temurin:17-jdk-alpine
 
 # Define the API_KEY build-time substitution variable
 ARG API_KEY
