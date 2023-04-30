@@ -39,8 +39,5 @@ public class User {
         this.isAdmin = admin;
     }
 
-    public boolean getAdmin(){
-        return isAdmin;
-    }
 
 }

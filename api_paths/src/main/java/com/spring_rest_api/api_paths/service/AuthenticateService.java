@@ -27,7 +27,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 @Service
-@DependsOn("firestoreInitialization")
+// @DependsOn("firestoreInitialization")
 public class AuthenticateService {
     private static final String COLLECTION_NAME = "Users";
     private static final String JWT_SECRET = "GIyoqsMwGPv2YEStDNat1qaXXbOH8lmwkvbUODyzoF8="; // Replace with your own secret
@@ -223,8 +223,8 @@ public class AuthenticateService {
     }
 
     // The following is for default username and secret
-    @PostConstruct
-    @DependsOn("firestoreInitialization")
+    // @PostConstruct
+    // @DependsOn("firestoreInitialization")
     public void createDefaultUser() {
         String defaultUsername = "admin";
         String defaultPassword = "admin";

@@ -4,3 +4,4 @@ entrypoint: 'java -jar target/ece461-part2.jar'
 
 env_variables:
   SPRING_PROFILES_ACTIVE: gcp
+  GOOGLE_APPLICATION_CREDENTIALS: src/main/resources/firestore_credentials.json
