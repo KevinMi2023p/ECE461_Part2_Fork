@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import com.google.api.core.ApiFuture;
@@ -19,6 +20,8 @@ import com.google.gson.Gson;
 import com.spring_rest_api.api_paths.entity.RegexSchema;
 
 @Service
+
+@DependsOn("firestoreInitialization")
 public class RegexService {
     
     private final String COLLECTION_NAME = "Packages";

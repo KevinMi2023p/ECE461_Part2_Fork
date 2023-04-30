@@ -30,7 +30,7 @@ public class PackagesPostController {
         System.out.println("Packages!");
     }
 
-    @PostMapping("/package")
+    @PostMapping(value = "/package", produces = "application/json")
     public ResponseEntity<String> package_single(@RequestBody Product product) throws ExecutionException, InterruptedException {
         //packageService.savePackage(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(packageService.savePackage(product));

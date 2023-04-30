@@ -25,3 +25,6 @@ build/
 ## Java ##
 **/*.class
 **/*.h
+
+## KEYS ## 
+**/resources/firestore_credentials.json

@@ -2,14 +2,16 @@ package com.spring_rest_api.api_paths.entity;
 
 import java.util.*;
 
-public class User {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public String name;
-    public boolean isAdmin;
+public class User {
+    
+    @JsonProperty("name")
+    private String name;
+    private boolean isAdmin;
     private Map<String, String> userAuthenticationInfo;
 
     public User() {}
-   
 
     public Map<String, String> getUserAuthenticationInfo() {
         return userAuthenticationInfo;
@@ -19,7 +21,7 @@ public class User {
         this.userAuthenticationInfo = userAuthenticationInfo;
     }
 
-    public User(String name,boolean isAdmin) {
+    public User(String name, boolean isAdmin) {
         this.name = name;
         this.isAdmin = isAdmin;
     }
@@ -36,8 +38,9 @@ public class User {
         return isAdmin;
     }
 
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
+    public void setIsAdmin(boolean admin) {
+        this.isAdmin = admin;
     }
+
 
 }
