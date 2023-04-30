@@ -48,7 +48,7 @@ jobs:
 
     - name: Write service account key to file
       run: |
-        echo "${{ secrets.FIREBASE_CREDENTIALS }}" > accountKey.json
+        echo '${{ secrets.FIREBASE_CREDENTIALS }}' > accountKey.json
         export GOOGLE_APPLICATION_CREDENTIALS=$PWD/accountKey.json
 
     - name: Build with Maven
