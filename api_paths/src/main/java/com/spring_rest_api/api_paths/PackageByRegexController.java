@@ -26,7 +26,7 @@ public class PackageByRegexController {
     @Autowired
     RegexService regexService;
 
-    @PostMapping("/package/byRegEx")
+    @PostMapping(value = "/package/byRegEx", produces = "application/json")
     public ResponseEntity<String> postMethodName(@RequestBody RegexSchema regexSchema,
             @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
         if (!validateToken(token)) {
