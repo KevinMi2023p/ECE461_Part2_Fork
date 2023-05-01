@@ -46,12 +46,15 @@ jobs:
     - name: Build clib
       run: sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
 
-    - name: Write service account key to file
+    - name: Create accountKey.json from FIREBASE_CREDENTIALS_BASE64
       run: |
-        echo ${{ secrets.FIREBASE_CREDENTIALS }} > accountKey.json
+        echo "${{ secrets.FIREBASE_CREDENTIALS_BASE64 }}" | base64 --decode > accountKey.json
 
-    - name: Set GOOGLE_APPLICATION_CREDENTIALS
-      run: echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/accountKey.json" >> $GITHUB_ENV
+    - name: Set GOOGLE_APPLICATION_CREDENTIALS environment variable
+      run: |
+        GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH=$(realpath accountKey.json)
+        export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH
+
 
     - name: Build with Maven
       run: mvn package
