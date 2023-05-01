@@ -46,22 +46,15 @@ jobs:
     - name: Build clib
       run: sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
 
-    - name: Run Spring Boot application
-      run: |
-        GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH=$(realpath accountKey.json)
-        java -Djava.security.egd=file:/dev/./urandom -DGOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH -jar api_paths/target/*.jar &
-        sleep 30
-
     - name: Build with Maven
       run: mvn package
       working-directory: api_paths
     
     - name: Run Spring Boot application
       run: |
-        java -Djava.security.egd=file:/dev/./urandom -jar api_paths/target/*.jar &
+        GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH=$(realpath accountKey.json)
+        java -Djava.security.egd=file:/dev/./urandom -DGOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH -jar api_paths/target/*.jar &
         sleep 30
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: $PWD/accountKey.json
 
 
     - name: Test Spring Boot application
