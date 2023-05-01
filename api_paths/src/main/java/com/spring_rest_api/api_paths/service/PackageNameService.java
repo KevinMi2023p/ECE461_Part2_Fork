@@ -13,9 +13,10 @@ import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.Gson;
-
+import org.springframework.context.annotation.DependsOn;
 
 @Service
+@DependsOn("firestoreInitialization")
 public class PackageNameService {
     private final String COLLECTION_NAME = "Packages";
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);

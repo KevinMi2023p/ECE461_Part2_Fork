@@ -28,7 +28,7 @@ JNIEXPORT jobject JNICALL Java_com_spring_1rest_1api_cli_NetScoreUtil_CalculateN
     }
 
     // instantiate and return the jobject if go was successful
-    jclass jclazz = env->FindClass("com/cli/NetScoreMetric");
+    jclass jclazz = env->FindClass("com/spring_rest_api/cli/NetScoreMetric");
     if (!jclazz) {
     #if DEBUG == 1
         printf("couldn't find jclass\n");

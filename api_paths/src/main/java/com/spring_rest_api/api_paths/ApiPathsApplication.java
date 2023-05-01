@@ -10,5 +10,4 @@ public class ApiPathsApplication {
     public static void main(String[] args) {
       SpringApplication.run(ApiPathsApplication.class, args);
     }
-
 }
