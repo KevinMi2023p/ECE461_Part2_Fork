@@ -43,7 +43,12 @@ jobs:
         run: javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
 
       - name: Build clib
-        run: sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
+        run: |
+          sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp cli/libpackageanalyze.so
+          sudo cp libpackageanalyze.* /usr/lib
+      
+      - name: Echo contents of cli directory
+        run: ls cli
 
       - name: Docker login
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
