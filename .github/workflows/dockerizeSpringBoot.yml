@@ -9,7 +9,6 @@ on:
 env:
   API_KEY: '${{ secrets.API_KEY }}'
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -92,8 +91,8 @@ jobs:
         docker push gcr.io/teamfirestorm-61564/my-docker-image
 
 
-   - name: Deploy to Cloud Run
-     run: |
-      gcloud run deploy my-service --image gcr.io/teamfirestorm-61564/my-docker-image --region us-central1 --platform managed --allow-unauthenticated
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy my-service --image gcr.io/teamfirestorm-61564/my-docker-image --region us-central1 --platform managed --allow-unauthenticated
 
 
