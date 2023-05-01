@@ -106,21 +106,16 @@ jobs:
       uses: google-github-actions/setup-gcloud@v1.1.0
       with:
         service_account_key: ${{ secrets.GCP_KSA_KEY }}
-        project_id: ece461test
-
-    - name: Authenticate with Google Cloud
-      uses: google-github-actions/auth@v1
-      with:
-        credentials_json: ${{ secrets.GCP_KSA_KEY }}
+        project_id: ${{ secrets.GCP_DOCKER_PROJECT_ID }}
 
     - name: Configure Docker
-      run: | 
-        echo ${{ secrets.GCP_KSA_KEY }} | base64 --decode > ${HOME}/gcloud-service-key.json
-        gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-        gcloud auth configure-docker
+      run: gcloud auth configure-docker --quiet
 
     - name: Tag and push Docker image to GCR
       run: |
         docker tag my-docker-image gcr.io/ece461test/my-docker-image
         docker push gcr.io/ece461test/my-docker-image
+
+    - name: Deploy Docker image
+      run: gcloud run deploy ${{ secrets.GCP_DOCKER_PROJECT_ID }} --image my-docker-image --region us-central1 --platform managed --allow-unauthenticated
 
