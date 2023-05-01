@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 COPY . /app
 
+# Installing Go
+RUN apt-get update && apt-get install -y golang
+
 # Build golib
 RUN cd cli && go build -o libpackageanalyze.so -buildmode=c-shared main.go && cd ..
 
