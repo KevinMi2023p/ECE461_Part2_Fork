@@ -9,9 +9,11 @@ import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 
+import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Filter;
 import com.google.cloud.firestore.Query;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import com.spring_rest_api.api_paths.entity.PagQuery;
 
@@ -20,7 +22,8 @@ import com.spring_rest_api.api_paths.entity.PagQuery;
 @Service
 public class PackagesQueryService {
     private final String COLLECTION_NAME = "Packages";
-    private final String fieldToCheck = "metadata.Name";
+    private final String NameField = "metadata.Name";
+    private final String VersionField = "metadata.Version";
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
 
     private int type_of_query(String version_query) {
@@ -55,13 +58,20 @@ public class PackagesQueryService {
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 
         for(PagQuery pags : pagQuerys) {
-            Query query = collectionReference.whereEqualTo(fieldToCheck, pags.get_Name());
+            Query query = collectionReference.whereEqualTo(NameField, pags.get_Name());
             String version_query = pags.get_Version();
 
             List<String> nums_found = this.get_nums_from_string(version_query);
-            for (String nf : nums_found) {
-                System.out.println(nf);
+
+            if (nums_found.size() == 1) {
+                query = query.whereEqualTo(VersionField, nums_found.get(0));
+            } else {
+                // query in ranges
             }
+            
+            
+
+
             System.out.println("------new pq------");
         }
 
