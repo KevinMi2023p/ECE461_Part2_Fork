@@ -8,6 +8,8 @@ COPY ./cli/libpackageanalyze.so /usr/lib/libpackageanalyze.so
 # Copy ./libNetScoreUtil.so to /usr/lib/
 COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
+RUN ls /app/cli/libpackageanalyze.so && ls /app/libNetScoreUtil.so && cp /app/cli/libpackageanalyze.so /usr/lib && cp /app/libNetScoreUtil.so /usr/lib || echo "Required files not found in /app/cli directory"
+
 
 
 WORKDIR /app
@@ -33,5 +35,7 @@ ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
 ENV LD_LIBRARY_PATH /usr/lib
 RUN ls /usr/lib/libpackageanalyze.so && ls /usr/lib/libNetScoreUtil.so || echo "Required files not found in /usr/lib directory"
 
+ENV JAVA_TOOL_OPTIONS -Djava.library.path=/usr/lib
+
 # Run the web service on container startup.
-CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar","-Djava.library.path=/usr/lib"]
+CMD ["java", "-Djava.security.egd=file:/dev/./urandom",  "-jar", "/app/app.jar","-Djava.library.path=/usr/lib"]
