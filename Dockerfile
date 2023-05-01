@@ -1,6 +1,6 @@
 # Use the official maven/Java 17 image to create a build artifact.
 # https://hub.docker.com/_/maven
-FROM adoptopenjdk:17-jdk-hotspot-focal AS build
+FROM openjdk:17-ea-jdk-oracle AS build
 WORKDIR /app
 COPY . /app
 
@@ -10,7 +10,7 @@ COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 RUN mvn -f /app/api_paths/pom.xml clean package
 
 # Use a base image that includes glibc
-FROM frolvlad/alpine-glibc:latest
+FROM openjdk:17-ea-jdk-oracle
 
 # Define the API_KEY build-time substitution variable
 ARG API_KEY
