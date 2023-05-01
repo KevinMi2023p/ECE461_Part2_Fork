@@ -4,6 +4,7 @@ import com.spring_rest_api.api_paths.entity.Data;
 import com.spring_rest_api.api_paths.entity.Metadata;
 import com.spring_rest_api.api_paths.entity.Product;
 import com.spring_rest_api.api_paths.entity.encodedProduct;
+import com.spring_rest_api.api_paths.service.AuthenticateService;
 import com.spring_rest_api.api_paths.service.PackageService;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,9 @@ public class PackagesPostController {
     @Autowired
     private PackageService packageService;
 
+    @Autowired
+    AuthenticateService authenticateService;
+
     public PackagesPostController() {
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
@@ -44,7 +49,11 @@ public class PackagesPostController {
     }
 
     @PostMapping("/package")
-    public ResponseEntity<String> package_single(@RequestBody encodedProduct encode) throws ExecutionException, InterruptedException {
+    public ResponseEntity<String> package_single(@RequestBody encodedProduct encode ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
+        if (!validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
+
+        }
         //packageService.savePackage(product);
 
         if(encode.getContent() != null && encode.getURL() != null ){
@@ -102,6 +111,14 @@ public class PackagesPostController {
             return ResponseEntity.status(HttpStatus.CREATED).body(str);
         }
 
+    }
+
+    private boolean validateToken(String token) {
+        try {
+            return authenticateService.validateJwtToken(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }
