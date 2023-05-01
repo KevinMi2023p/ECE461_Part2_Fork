@@ -56,7 +56,7 @@ jobs:
 
     - name: Create the Github token txt file.
       run: |
-        echo ${{ secrets.githubToken }} | tee api_paths/src/main/resources/githubToken.txt
+        echo ${{ secrets.GITHUBTOKEN }} | tee api_paths/src/main/resources/githubToken.txt
         sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
 
     - name: Build JAR file

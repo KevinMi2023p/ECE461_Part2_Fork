@@ -9,6 +9,7 @@ import com.spring_rest_api.api_paths.service.PackageService;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,6 +60,8 @@ public class PackagesPostController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
 
         }
+        logger.debug("Token Value: {}",token);
+        logger.debug("URL value: {}",encode.URL);
         //packageService.savePackage(product);
 
         // Content and URL are both set
@@ -69,6 +72,7 @@ public class PackagesPostController {
         if (encode.getContent() == null && encode.getURL() != null) {
             String githubUrl = encode.getURL();
             String accessToken = readAccessTokenFromFile();
+            logger.debug("Github Access Token: {}",accessToken);
 
             URL url = new URL(githubUrl + "/archive/refs/heads/master.zip");
             URLConnection connection = url.openConnection();
@@ -207,9 +211,11 @@ public class PackagesPostController {
     }
 
     private static String readAccessTokenFromFile() throws IOException {
-        FileInputStream fileInputStream = new FileInputStream("src/main/resources/githubToken.txt");
-        byte[] bytes = fileInputStream.readAllBytes();
-        return new String(bytes, StandardCharsets.UTF_8);
+        ClassPathResource resource = new ClassPathResource("githubToken.txt");
+        try (InputStream inputStream = resource.getInputStream()) {
+            byte[] bytes = inputStream.readAllBytes();
+            return new String(bytes, StandardCharsets.UTF_8);
+        }
     }
 
 
