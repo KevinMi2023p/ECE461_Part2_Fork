@@ -11,6 +11,7 @@ COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
 RUN ls /app/cli/libpackageanalyze.so && ls /app/libNetScoreUtil.so && cp /app/cli/libpackageanalyze.so /usr/lib && cp /app/libNetScoreUtil.so /usr/lib || echo "Required files not found in /app/cli directory"
 
+RUN ls /app
 RUN mvn -f /app/api_paths/pom.xml clean package
 
 # Use AdoptOpenJDK for base image.
