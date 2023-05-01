@@ -2,9 +2,12 @@ package com.spring_rest_api.api_paths;
 
 import com.spring_rest_api.api_paths.entity.Data;
 import com.spring_rest_api.api_paths.entity.Metadata;
+import com.spring_rest_api.api_paths.entity.PagQuery;
 import com.spring_rest_api.api_paths.entity.Product;
 import com.spring_rest_api.api_paths.entity.encodedProduct;
 import com.spring_rest_api.api_paths.service.PackageService;
+import com.spring_rest_api.api_paths.service.PackagesQueryService;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.json.JSONException;
@@ -27,7 +30,8 @@ import java.util.concurrent.ExecutionException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.commons.io.IOUtils;
@@ -43,13 +47,19 @@ public class PackagesPostController {
     @Autowired
     private PackageService packageService;
 
+    @Autowired
+    private PackagesQueryService packagesQueryService;
+
     public PackagesPostController() {
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
     
-    @PostMapping("/packages")
-    public void packages_plurual() {
-        System.out.println("Packages!");
+    @PostMapping(value = "/packages", produces = "application/json")
+    public List<Map<String,Object>> packages_plurual(@RequestBody List<PagQuery> pagQuerys) throws ExecutionException, InterruptedException {
+        // System.out.println("Packages!");
+        // System.out.println(pagQuery.get_Name() + " " + pagQuery.get_Version());
+        List<Map<String,Object>> result = packagesQueryService.pagnitatedqueries(pagQuerys);
+        return result;
     }
 
     @PostMapping("/package")
