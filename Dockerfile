@@ -24,8 +24,6 @@ ARG API_KEY
 # Set the API_KEY environment variable
 ENV API_KEY=${API_KEY}
 
-EXPOSE 8080
-
 # Copy the jar to the production image from the build stage.
 COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
 COPY --from=build /app/accountKey.json /app/accountKey.json
