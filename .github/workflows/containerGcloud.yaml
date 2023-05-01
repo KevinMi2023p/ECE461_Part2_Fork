@@ -48,6 +48,18 @@ jobs:
     - name: Build with Maven
       run: mvn package
       working-directory: api_paths
+    
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1.1.0
+      with:
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+    - name: Authenticate with GCP
+      uses: google-github-actions/setup-gcloud@v1.1.0
+      with:
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
 
     - name: Build and push Docker image
       run: |
@@ -59,11 +71,6 @@ jobs:
         docker build --no-cache -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-docker-image:${{ github.sha }} .
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-docker-image:${{ github.sha }}
 
-    - name: Authenticate with GCP
-      uses: google-github-actions/setup-gcloud@v1.1.0
-      with:
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
 
     - name: Deploy Docker image to GCP Cloud Run
       run: |
