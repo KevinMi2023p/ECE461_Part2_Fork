@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 COPY . /app
 
+COPY cli /app/cli
+
 FROM golang:1.19
 
 # Build golib
