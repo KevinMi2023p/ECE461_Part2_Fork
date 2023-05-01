@@ -103,3 +103,21 @@ jobs:
       
     - name: Stop Docker container
       run: docker stop my-docker-container
+
+        - name: Configure Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ece461test
+        service_account_key: ${{ secrets.GCP_KSA_KEY }}
+
+    - name: Configure Docker
+      run: | 
+        echo ${{ secrets.GCP_KSA_KEY }} | base64 --decode > ${HOME}/gcloud-service-key.json
+        gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+        gcloud auth configure-docker
+
+    - name: Tag and push Docker image to GCR
+      run: |
+        docker tag my-docker-image gcr.io/ece461test/my-docker-image
+        docker push gcr.io/ece461test/my-docker-image
+
