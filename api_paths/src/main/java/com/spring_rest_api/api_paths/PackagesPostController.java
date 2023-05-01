@@ -63,7 +63,7 @@ public class PackagesPostController {
         // Content is not set and URL is set
         if (encode.getContent() == null && encode.getURL() != null) {
             String githubUrl = encode.getURL();
-            String accessToken = "";
+            String accessToken = "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";
 
             URL url = new URL(githubUrl + "/archive/refs/heads/master.zip");
             URLConnection connection = url.openConnection();
@@ -92,9 +92,13 @@ public class PackagesPostController {
                 //TarArchiveEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
                     //System.out.println(entry.getName());
-                    if (!entry.isDirectory() && entry.getName().endsWith("package.json")) {
+                    String entry_name = entry.getName();
+                    int valid_file = entry_name.length() - entry_name.replace("/","").length();
+                    //if (!entry.isDirectory() && entry.getName().endsWith("package.json"))
+                    if (valid_file == 1 && entry.getName().endsWith("package.json")){
                         String jsonContent = IOUtils.toString(zis, "UTF-8");
                         JSONObject jsonObject = new JSONObject(jsonContent);
+                        //System.out.println(jsonObject.toString(2));
                         try {
                             String name = jsonObject.getString("name");
                             String version = jsonObject.getString("version");
@@ -123,6 +127,7 @@ public class PackagesPostController {
             if (exists == 0) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.");
             } else {
+                System.out.println(product.getData().getContent().length());
                 String str = packageService.savePackage(product);
                 if (str == "Package exists already") {
                     return ResponseEntity.status(HttpStatus.CONFLICT).body(str);
@@ -143,8 +148,10 @@ public class PackagesPostController {
                  ZipInputStream zis = new ZipInputStream(is)) {
                 ZipEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
-                    System.out.println(entry.getName());
-                    if (!entry.isDirectory() && entry.getName().endsWith("package.json")) {
+                    //System.out.println(entry.getName());
+                    String entry_name = entry.getName();
+                    int valid_file = entry_name.length() - entry_name.replace("/","").length();
+                    if (valid_file == 1 && entry.getName().endsWith("package.json")) {
                         String jsonContent = IOUtils.toString(zis, "UTF-8");
                         JSONObject jsonObject = new JSONObject(jsonContent);
                         try {
