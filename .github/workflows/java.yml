@@ -50,23 +50,16 @@ jobs:
       run: |
         echo "${{ secrets.FIREBASE_CREDENTIALS_BASE64 }}" | base64 --decode > accountKey.json
 
-    - name: Set GOOGLE_APPLICATION_CREDENTIALS environment variable
-      run: |
-        GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH=$(realpath accountKey.json)
-        export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH
-
-
     - name: Build with Maven
       run: mvn package
       working-directory: api_paths
     
     - name: Run Spring Boot application
       run: |
+        GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH=$(realpath accountKey.json)
+        export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH
         java -Djava.security.egd=file:/dev/./urandom -jar api_paths/target/*.jar &
         sleep 30
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ env.GOOGLE_APPLICATION_CREDENTIALS }}
-
 
     - name: Test Spring Boot application
       run: curl http://localhost:8080/
