@@ -7,20 +7,20 @@ public class PagQuery {
     public String Name;
 
     @PropertyName("Version")
-    void set_Version(String version){
+    public void set_Version(String version){
         this.Version = version;
     }
 
-    String get_Version() {
+    public String get_Version() {
         return this.Version;
     }
 
     @PropertyName("Name")
-    void set_Name(String name){
+    public void set_Name(String name){
         this.Name = name;
     }
 
-    String get_String() {
+    public String get_Name() {
         return this.Name;
     }
 }
