@@ -63,7 +63,7 @@ public class PackagesPostController {
         // Content is not set and URL is set
         if (encode.getContent() == null && encode.getURL() != null) {
             String githubUrl = encode.getURL();
-            String accessToken = "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";
+            String accessToken = "";
 
             URL url = new URL(githubUrl + "/archive/refs/heads/master.zip");
             URLConnection connection = url.openConnection();
