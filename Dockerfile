@@ -6,6 +6,7 @@ WORKDIR /app
 COPY . /app
 
 # Build native library
+RUN apt-get update && apt-get install -y gcc
 RUN gcc -shared -o libpackageanalyze.so -fPIC -I/usr/lib/jvm/java-11-openjdk-amd64/include -I/usr/lib/jvm/java-11-openjdk-amd64/include/linux ./cli/libpackageanalyze.c
 RUN gcc -shared -o libNetScoreUtil.so -fPIC -I/usr/lib/jvm/java-11-openjdk-amd64/include -I/usr/lib/jvm/java-11-openjdk-amd64/include/linux ./cli/libNetScoreUtil.c
 
