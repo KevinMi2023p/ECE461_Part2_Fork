@@ -54,6 +54,11 @@ jobs:
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+    - name: Create the Github token txt file.
+      run: |
+        echo ${{ secrets.githubToken }} | tee api_paths/src/main/resources/githubToken.txt
+        sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
+
     - name: Build JAR file
       run: mvn package
       working-directory: api_paths

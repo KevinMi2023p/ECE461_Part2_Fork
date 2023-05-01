@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 
 import java.io.*;
@@ -67,7 +68,7 @@ public class PackagesPostController {
         // Content is not set and URL is set
         if (encode.getContent() == null && encode.getURL() != null) {
             String githubUrl = encode.getURL();
-            String accessToken = "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";
+            String accessToken = readAccessTokenFromFile();
 
             URL url = new URL(githubUrl + "/archive/refs/heads/master.zip");
             URLConnection connection = url.openConnection();
@@ -203,6 +204,12 @@ public class PackagesPostController {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private static String readAccessTokenFromFile() throws IOException {
+        FileInputStream fileInputStream = new FileInputStream("api_paths/src/main/resources/githubToken.txt");
+        byte[] bytes = fileInputStream.readAllBytes();
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
 
