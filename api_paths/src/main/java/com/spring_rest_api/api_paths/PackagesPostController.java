@@ -7,7 +7,6 @@ import com.spring_rest_api.api_paths.entity.encodedProduct;
 import com.spring_rest_api.api_paths.service.AuthenticateService;
 import com.spring_rest_api.api_paths.service.PackageService;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,22 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.SQLOutput;
 import java.util.concurrent.ExecutionException;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 
 
 @RestController
@@ -58,7 +53,7 @@ public class PackagesPostController {
     }
 
     @PostMapping("/package")
-    public ResponseEntity<String> package_single(@RequestBody encodedProduct encode ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
+    public ResponseEntity<String> package_single(@RequestBody encodedProduct encode ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException , MalformedURLException, IOException {
         if (!validateToken(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
 
@@ -72,7 +67,7 @@ public class PackagesPostController {
         // Content is not set and URL is set
         if (encode.getContent() == null && encode.getURL() != null) {
             String githubUrl = encode.getURL();
-            String accessToken = "";
+            String accessToken = "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";
 
             URL url = new URL(githubUrl + "/archive/refs/heads/master.zip");
             URLConnection connection = url.openConnection();
