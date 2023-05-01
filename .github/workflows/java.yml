@@ -95,8 +95,6 @@ jobs:
           echo "Container 'my-docker-container' not found or has exited early."
         fi
 
-
-
     - name: Verify Spring Boot application
       run: |
         curl http://localhost:8080/
@@ -104,7 +102,7 @@ jobs:
     - name: Stop Docker container
       run: docker stop my-docker-container
 
-        - name: Configure Google Cloud SDK
+    - name: Configure Google Cloud SDK
       uses: google-github-actions/setup-gcloud@master
       with:
         project_id: ece461test
