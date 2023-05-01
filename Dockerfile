@@ -4,14 +4,19 @@ FROM maven:3.8.3-openjdk-17-slim AS build
 WORKDIR /app
 COPY . /app
 # Copy ./cli/libpackageanalyze.so to /usr/lib/
-COPY ./cli/libpackageanalyze.so /usr/lib/libpackageanalyze.so
 
-# Copy ./libNetScoreUtil.so to /usr/lib/
-COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
-RUN ls /app/cli/libpackageanalyze.so && ls /app/libNetScoreUtil.so && cp /app/cli/libpackageanalyze.so /usr/lib && cp /app/libNetScoreUtil.so /usr/lib || echo "Required files not found in /app/cli directory"
+
+COPY ./cli/libpackageanalyze.so /app
+COPY ./libNetScoreUtil.so /app
 
 RUN ls /app
+
+RUN cp /app/libpackageanalyze.so /usr/lib
+RUN cp /app/libNetScoreUtil.so /usr/lib
+
+RUN ls /usr/lib && echo "Contents of /usr/lib listed above."
+
 RUN mvn -f /app/api_paths/pom.xml clean package
 
 # Use AdoptOpenJDK for base image.
