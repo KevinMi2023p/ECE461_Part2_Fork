@@ -207,7 +207,7 @@ public class PackagesPostController {
     }
 
     private static String readAccessTokenFromFile() throws IOException {
-        FileInputStream fileInputStream = new FileInputStream("api_paths/src/main/resources/githubToken.txt");
+        FileInputStream fileInputStream = new FileInputStream("src/main/resources/githubToken.txt");
         byte[] bytes = fileInputStream.readAllBytes();
         return new String(bytes, StandardCharsets.UTF_8);
     }
