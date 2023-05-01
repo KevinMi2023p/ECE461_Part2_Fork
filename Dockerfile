@@ -31,4 +31,4 @@ COPY --from=build /app/accountKey.json /app/accountKey.json
 ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
 
 # Run the web service on container startup.
-CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]
+CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar","-Djava.library.path=/usr/lib"]
