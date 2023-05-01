@@ -1,6 +1,6 @@
 # Use the official maven/Java 17 image to create a build artifact.
 # https://hub.docker.com/_/maven
-FROM maven:3.8.3-openjdk-17-slim AS build
+FROM adoptopenjdk:17-jdk-hotspot-focal AS build
 WORKDIR /app
 COPY . /app
 
@@ -9,9 +9,8 @@ COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
 RUN mvn -f /app/api_paths/pom.xml clean package
 
-# Use AdoptOpenJDK for base image.
-# https://hub.docker.com/_/adoptopenjdk
-FROM openjdk:17-jdk-slim-buster
+# Use a base image that includes glibc
+FROM frolvlad/alpine-glibc:latest
 
 # Define the API_KEY build-time substitution variable
 ARG API_KEY
@@ -22,7 +21,6 @@ ENV API_KEY=${API_KEY}
 # Copy the jar to the production image from the build stage.
 COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
 COPY --from=build /app/accountKey.json /app/accountKey.json
-
 COPY --from=build /usr/lib/libpackageanalyze.so /usr/lib/libpackageanalyze.so
 COPY --from=build /usr/lib/libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
