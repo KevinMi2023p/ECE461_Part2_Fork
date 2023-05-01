@@ -66,32 +66,33 @@ jobs:
       run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
 
-    # - name: Build for Docker
-    #   run: |
-    #     docker build --no-cache -t my-docker-image --build-arg API_KEY=$API_KEY .
-    #     docker images
-    #     docker run --rm -d -p 8080:8080 --name my-docker-container -v ${PWD}/api_paths/src/main/resources/application.properties:/app/resources/application.properties my-docker-image
-    #     sleep 30
+    - name: Build for Docker
+      run: |
+        echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 --decode > accountKey.json
+        docker build --no-cache -t my-docker-image .
+        docker images
+        docker run --rm -d -p 8080:8080 --name my-docker-container my-docker-image
+        sleep 30
 
-    # - name: Get container ID
-    #   run: |
-    #     container_id=$(docker ps -aqf "name=my-docker-container")
-    #     echo "container_id=$container_id" >> $GITHUB_ENV
+    - name: Get container ID
+      run: |
+        container_id=$(docker ps -aqf "name=my-docker-container")
+        echo "container_id=$container_id" >> $GITHUB_ENV
         
-    # - name: Print Docker container logs
-    #   run: |
-    #     container_id=$(docker ps -aqf "name=my-docker-container")
-    #     if [ -n "$container_id" ]; then
-    #       docker logs $container_id
-    #     else
-    #       echo "Container 'my-docker-container' not found or has exited early."
-    #     fi
+    - name: Print Docker container logs
+      run: |
+        container_id=$(docker ps -aqf "name=my-docker-container")
+        if [ -n "$container_id" ]; then
+          docker logs $container_id
+        else
+          echo "Container 'my-docker-container' not found or has exited early."
+        fi
 
 
 
-    # - name: Verify Spring Boot application
-    #   run: |
-    #     curl http://localhost:8080/
+    - name: Verify Spring Boot application
+      run: |
+        curl http://localhost:8080/
       
-    # - name: Stop Docker container
-    #   run: docker stop my-docker-container
+    - name: Stop Docker container
+      run: docker stop my-docker-container

@@ -28,6 +28,9 @@ EXPOSE 8080
 
 # Copy the jar to the production image from the build stage.
 COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
+COPY --from=build /app/accountKey.json /app/accountKey.json
+
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
 
 # Run the web service on container startup.
 CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]
