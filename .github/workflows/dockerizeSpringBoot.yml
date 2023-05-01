@@ -48,6 +48,11 @@ jobs:
       - name: Docker login
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
+      - name: Create the Github token txt file.
+        run: |
+          echo ${{ secrets.GITHUBTOKEN }} | tee api_paths/src/main/resources/githubToken.txt
+          sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
+
       - name: Build for Docker
         run: |
           echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 --decode > accountKey.json
@@ -83,7 +88,7 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           project_id: teamfirestorm-61564
           export_default_credentials: true
-          
+
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
         with:
