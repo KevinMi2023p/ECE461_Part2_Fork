@@ -62,6 +62,13 @@ jobs:
     - name: Test Spring Boot application
       run: curl http://localhost:8080/
 
+    - name: Stop Spring Boot application
+      run: |
+        pid=$(lsof -t -i:8080)
+        if [ -n "$pid" ]; then
+          kill $pid
+        fi
+
     - name: Docker login
       run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
