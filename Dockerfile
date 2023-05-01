@@ -2,20 +2,16 @@
 # https://hub.docker.com/_/maven
 FROM maven:3.8.3-openjdk-17-slim AS build
 
+# Copy ./cli/libpackageanalyze.so to /usr/lib/
+COPY ./cli/libpackageanalyze.so /usr/lib/libpackageanalyze.so
+
+# Copy ./libNetScoreUtil.so to /usr/lib/
+COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
+
+
+
 WORKDIR /app
 COPY . /app
-
-# Build native library
-RUN apt-get update && apt-get install -y gcc
-RUN gcc -shared -o libpackageanalyze.so -fPIC -I/usr/lib/jvm/java-11-openjdk-amd64/include -I/usr/lib/jvm/java-11-openjdk-amd64/include/linux ./cli/libpackageanalyze.c
-RUN gcc -shared -o libNetScoreUtil.so -fPIC -I/usr/lib/jvm/java-11-openjdk-amd64/include -I/usr/lib/jvm/java-11-openjdk-amd64/include/linux ./cli/libNetScoreUtil.c
-
-# Copy native libraries to the library path
-RUN mkdir -p /usr/local/lib
-RUN cp /app/libpackageanalyze.so /usr/local/lib/libpackageanalyze.so
-RUN cp /app/libNetScoreUtil.so /usr/local/lib/libNetScoreUtil.so
-
-# Build the project with Maven
 RUN mvn -f /app/api_paths/pom.xml clean package
 
 # Use AdoptOpenJDK for base image.
@@ -34,8 +30,7 @@ COPY --from=build /app/accountKey.json /app/accountKey.json
 
 ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
 
-# Set the library path
-ENV LD_LIBRARY_PATH=/usr/local/lib
+ENV LD_LIBRARY_PATH=/usr/lib
 
 # Run the web service on container startup.
-CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]
+CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar","-Djava.library.path=/usr/lib"]
