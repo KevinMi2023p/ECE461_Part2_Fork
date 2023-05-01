@@ -214,7 +214,7 @@ public class PackagesPostController {
         ClassPathResource resource = new ClassPathResource("githubToken.txt");
         try (InputStream inputStream = resource.getInputStream()) {
             byte[] bytes = inputStream.readAllBytes();
-            return new String(bytes, StandardCharsets.UTF_8);
+            return new String(bytes, StandardCharsets.UTF_8).trim();
         }
     }
 
