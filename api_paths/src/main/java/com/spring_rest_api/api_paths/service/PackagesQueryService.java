@@ -1,6 +1,7 @@
 package com.spring_rest_api.api_paths.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Filter;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QuerySnapshot;
@@ -52,7 +54,7 @@ public class PackagesQueryService {
         return result;
     }
 
-    public String pagnitatedqueries(List<PagQuery> pagQuerys) throws ExecutionException, InterruptedException {
+    public List<Map<String, Object>> pagnitatedqueries(List<PagQuery> pagQuerys) throws ExecutionException, InterruptedException {
         // Note, there is no OR query for Java on Firestore
 
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
@@ -65,16 +67,21 @@ public class PackagesQueryService {
 
             if (nums_found.size() == 1) {
                 query = query.whereEqualTo(VersionField, nums_found.get(0));
+            } else if (nums_found.size() == 2) {
+                query = query.whereEqualTo(VersionField, nums_found.get(0) + "-" + nums_found.get(1));
             } else {
-                // query in ranges
+                // invalid request
+                return null;
             }
             
-            
-
-
-            System.out.println("------new pq------");
+            ApiFuture<QuerySnapshot> future = query.get();
+            for (DocumentSnapshot document : future.get().getDocuments()) {
+                Map<String,Object> metaData = (Map<String, Object>) document.getData().get("metadata");
+                result.add(metaData);
+            }
+            // System.out.println("------new pq------");
         }
 
-        return "";
+        return result;
     }
 }
