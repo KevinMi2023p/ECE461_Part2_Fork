@@ -52,7 +52,7 @@ jobs:
     
     - name: Run Spring Boot application
       run: |
-        echo "${{ secrets.FIREBASE_CREDENTIALS_BASE64 }}" | base64 --decode > accountKey.json
+        echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 --decode > accountKey.json
         cat accountKey.json
         GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH=$(realpath accountKey.json)
         export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH
