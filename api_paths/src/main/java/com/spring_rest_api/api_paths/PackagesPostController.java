@@ -5,6 +5,9 @@ import com.spring_rest_api.api_paths.entity.Metadata;
 import com.spring_rest_api.api_paths.entity.Product;
 import com.spring_rest_api.api_paths.entity.encodedProduct;
 import com.spring_rest_api.api_paths.service.PackageService;
+import com.spring_rest_api.cli.NetScoreMetric;
+import com.spring_rest_api.cli.NetScoreUtil;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.json.JSONException;
@@ -52,7 +55,7 @@ public class PackagesPostController {
         System.out.println("Packages!");
     }
 
-    @PostMapping("/package")
+    @PostMapping(value = "/package", produces = "application/json")
     public ResponseEntity<String> package_single(@RequestBody encodedProduct encode) throws ExecutionException, InterruptedException, IOException {
         //packageService.savePackage(product);
 
@@ -62,6 +65,11 @@ public class PackagesPostController {
         }
         // Content is not set and URL is set
         if (encode.getContent() == null && encode.getURL() != null) {
+            NetScoreMetric nsm = NetScoreUtil.GetNetScore(encode.getURL());
+            // if condition can change based on score we want to pass
+            if (nsm.NetScore <= -1.0)
+                return ResponseEntity.status(424).body("Package is not uploaded due to the disqualified rating.");
+
             String githubUrl = encode.getURL();
             String accessToken = "";
 
