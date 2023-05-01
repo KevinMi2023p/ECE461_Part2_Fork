@@ -50,7 +50,7 @@ jobs:
 
       - name: Build for Docker
         run: |
-          echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > accountKey.json
+          echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 --decode > accountKey.json
           docker build --no-cache -t my-docker-image .
           docker images
           docker run --rm -d -p 8080:8080 --name my-docker-container my-docker-image
