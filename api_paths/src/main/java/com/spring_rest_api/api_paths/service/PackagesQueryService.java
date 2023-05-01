@@ -35,6 +35,20 @@ public class PackagesQueryService {
         return -1;
     }
 
+    private List<String> get_nums_from_string(String v_query) {
+        List<String> result = new ArrayList<String>();
+
+        // Why double backslash on this regex
+        // https://stackoverflow.com/questions/22218350/invalid-escape-sequence-valid-ones-are-b-t-n-f-r-in-java
+        Pattern pattern = Pattern.compile("[0-9]\\.[0-9]\\.[0-9]");
+        Matcher match = pattern.matcher(v_query);
+        while (match.find()) {
+            result.add(match.group());
+        }
+
+        return result;
+    }
+
     public String pagnitatedqueries(List<PagQuery> pagQuerys) throws ExecutionException, InterruptedException {
         // Note, there is no OR query for Java on Firestore
 
@@ -42,12 +56,13 @@ public class PackagesQueryService {
 
         for(PagQuery pags : pagQuerys) {
             Query query = collectionReference.whereEqualTo(fieldToCheck, pags.get_Name());
-            int request_type = this.type_of_query(pags.get_Version());
-            if (request_type == -1) {
-                // log invalid Query
-                continue;
+            String version_query = pags.get_Version();
+
+            List<String> nums_found = this.get_nums_from_string(version_query);
+            for (String nf : nums_found) {
+                System.out.println(nf);
             }
-            
+            System.out.println("------new pq------");
         }
 
         return "";
