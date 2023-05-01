@@ -1,0 +1,74 @@
+name: Containerizing and Deploying
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  API_KEY: '${{ secrets.API_KEY }}'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up GCC
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: latest
+        platform: x64
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
+
+    - name: Build golib
+      run: |
+        cd cli
+        go build -o libpackageanalyze.so -buildmode=c-shared main.go 
+        sudo cp libpackageanalyze.* /usr/lib
+        cd ..
+
+    - name: Set up Java
+      uses: actions/setup-java@v1
+      with:
+        java-version: '17'
+
+    - name: Build jheader
+      run: javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
+
+    - name: Build clib
+      run: sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
+
+    - name: Build with Maven
+      run: mvn package
+      working-directory: api_paths
+
+    - name: Build and push Docker image
+      run: |
+        echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 --decode > accountKey.json
+        cat accountKey.json
+        GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH=$(realpath accountKey.json)
+        export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS_ABSOLUTE_PATH
+        echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+        docker build --no-cache -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-docker-image:${{ github.sha }} .
+        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-docker-image:${{ github.sha }}
+
+    - name: Authenticate with GCP
+      uses: google-github-actions/setup-gcloud@v1.1.0
+      with:
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+    - name: Deploy Docker image to GCP Cloud Run
+      run: |
+        gcloud run deploy my-docker-image \
+        --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-docker-image:${{ github.sha }} \
+        --platform managed \
+        --region us-central1 \
+        --quiet

@@ -1,4 +1,4 @@
-name: Build and Test
+name: Containerizing Spring Boot Application
 
 on:
   push:
@@ -101,21 +101,3 @@ jobs:
       
     - name: Stop Docker container
       run: docker stop my-docker-container
-
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1.1.0
-      with:
-        service_account_key: ${{ secrets.GCP_KSA_KEY }}
-        project_id: ${{ secrets.GCP_DOCKER_PROJECT_ID }}
-
-    - name: Configure Docker
-      run: gcloud auth configure-docker --quiet
-
-    - name: Tag and push Docker image to GCR
-      run: |
-        docker tag my-docker-image gcr.io/ece461test/my-docker-image
-        docker push gcr.io/ece461test/my-docker-image
-
-    - name: Deploy Docker image
-      run: gcloud run deploy ${{ secrets.GCP_DOCKER_PROJECT_ID }} --image my-docker-image --region us-central1 --platform managed --allow-unauthenticated
-
