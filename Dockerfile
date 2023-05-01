@@ -12,13 +12,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Installing the latest version of Go
-RUN curl -L https://golang.org/dl/go1.17.6.linux-amd64.tar.gz -o go.tar.gz \
-    && tar -C /usr/local -xzf go.tar.gz \
-    && rm go.tar.gz \
-    && export PATH=$PATH:/usr/local/go/bin
 
 WORKDIR /app
 COPY . /app
+
+FROM golang:1.19
 
 # Build golib
 RUN cd cli && go build -o libpackageanalyze.so -buildmode=c-shared main.go && cd ..
