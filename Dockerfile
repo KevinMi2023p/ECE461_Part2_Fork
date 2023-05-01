@@ -29,7 +29,8 @@ COPY --from=build /app/accountKey.json /app/accountKey.json
 
 ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
 
-ENV LD_LIBRARY_PATH /usr/lib
+ENV LD_LIBRARY_PATH=/usr/lib
+RUN ls /usr/lib && echo "Contents of /usr/lib listed above."
 RUN ls /usr/lib/libpackageanalyze.so && ls /usr/lib/libNetScoreUtil.so || echo "Required files not found in /usr/lib directory"
 
 ENV JAVA_TOOL_OPTIONS -Djava.library.path=/usr/lib
