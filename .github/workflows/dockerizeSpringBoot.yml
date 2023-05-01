@@ -21,10 +21,6 @@ jobs:
       with:
         java-version: '17'
 
-    - name: Build with Maven
-      run: mvn package
-      working-directory: api_paths
-
     - name: Docker login
       run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
