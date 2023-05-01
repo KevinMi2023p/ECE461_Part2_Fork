@@ -64,6 +64,8 @@ jobs:
       run: |
         java -Djava.security.egd=file:/dev/./urandom -jar api_paths/target/*.jar &
         sleep 30
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ env.GOOGLE_APPLICATION_CREDENTIALS }}
 
 
     - name: Test Spring Boot application
