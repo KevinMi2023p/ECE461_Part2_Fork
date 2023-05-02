@@ -6,7 +6,7 @@ COPY . /app
 # COPY ./cli/libpackageanalyze.so /usr/lib/libpackageanalyze.so
 # COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
-RUN javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
+
 
 RUN mvn -f /app/api_paths/pom.xml clean package
 
@@ -55,7 +55,7 @@ RUN cd cli && \
     cp libpackageanalyze.* /usr/lib && \
     cd .. 
 
-RUN ls /usr/lib
+RUN javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
 
 RUN g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /usr/lib/libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
 
