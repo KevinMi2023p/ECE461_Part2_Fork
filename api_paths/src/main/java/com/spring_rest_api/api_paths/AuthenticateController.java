@@ -41,9 +41,11 @@ public class AuthenticateController {
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request) {
         logger.info("User: {}", request.getUser());
         logger.info("Secret: {}", request.getSecret());
+        System.out.println("User " + request.getUser() + " Secret " + request.getSecret());
         String token;
         try {
             token = userService.authenticateUser(request.getUser(), request.getSecret());
+            System.out.println("Token Generated" + request.getSecret());
         } catch (ExecutionException | InterruptedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Authentication failed.");
         } catch (IllegalArgumentException e) {

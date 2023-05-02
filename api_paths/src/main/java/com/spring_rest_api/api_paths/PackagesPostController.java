@@ -4,35 +4,34 @@ import com.spring_rest_api.api_paths.entity.Data;
 import com.spring_rest_api.api_paths.entity.Metadata;
 import com.spring_rest_api.api_paths.entity.Product;
 import com.spring_rest_api.api_paths.entity.encodedProduct;
+import com.spring_rest_api.api_paths.service.AuthenticateService;
 import com.spring_rest_api.api_paths.service.PackageService;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.SQLOutput;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 
 
 @RestController
@@ -42,6 +41,9 @@ public class PackagesPostController {
 
     @Autowired
     private PackageService packageService;
+
+    @Autowired
+    AuthenticateService authenticateService;
 
     public PackagesPostController() {
         this.logger = LoggerFactory.getLogger(this.getClass());
@@ -53,17 +55,26 @@ public class PackagesPostController {
     }
 
     @PostMapping("/package")
-    public ResponseEntity<String> package_single(@RequestBody encodedProduct encode) throws ExecutionException, InterruptedException, IOException {
+    public ResponseEntity<String> package_single(@RequestBody encodedProduct encode ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException , MalformedURLException, IOException {
+        if (!validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
+
+        }
+        System.out.println("encode URL " + encode.URL + " encode content " + encode.Content + "encode jsprogram" + encode.JSProgram);
+        logger.debug("Token Value: {}",token);
+        logger.debug("URL value: {}",encode.URL);
         //packageService.savePackage(product);
 
         // Content and URL are both set
         if (encode.getContent() != null && encode.getURL() != null) {
+            System.out.println("encode URL " + encode.URL + " encode content " + encode.Content + "encode jsprogram" + encode.JSProgram);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.");
         }
         // Content is not set and URL is set
         if (encode.getContent() == null && encode.getURL() != null) {
             String githubUrl = encode.getURL();
-            String accessToken = "";
+            String accessToken = readAccessTokenFromFile();
+            logger.debug("Github Access Token: {}",accessToken);
 
             URL url = new URL(githubUrl + "/archive/refs/heads/master.zip");
             URLConnection connection = url.openConnection();
@@ -192,4 +203,22 @@ public class PackagesPostController {
 
         return null;
     }
+
+    private boolean validateToken(String token) {
+        try {
+            return authenticateService.validateJwtToken(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static String readAccessTokenFromFile() throws IOException {
+        ClassPathResource resource = new ClassPathResource("githubToken.txt");
+        try (InputStream inputStream = resource.getInputStream()) {
+            byte[] bytes = inputStream.readAllBytes();
+            return new String(bytes, StandardCharsets.UTF_8).trim();
+        }
+    }
+
+
 }
