@@ -28,6 +28,16 @@ public class PackagesQueryService {
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
 
 
+    // Will Check if the Queries are valid before actually executing them
+    public boolean checkValidQuery(List<PagQuery> list_pagQueries) {
+        for (PagQuery pq : list_pagQueries) {
+            if (type_of_query(pq.get_Version()) == -1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     // Check type of query based on swagger
     // We'll check if it's valid and how it affects the query
     private int type_of_query(String version_query) {
