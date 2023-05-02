@@ -13,7 +13,7 @@ steps:
 
   # Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/my-docker-image', '--build-arg', 'API_KEY=$API_KEY', '--build-arg', 'ACCOUNT_KEY=$accountKey', '.']
+    args: ['build', '-t','--network=cloudbuild', 'gcr.io/$PROJECT_ID/my-docker-image', '--build-arg', 'API_KEY=$API_KEY', '--build-arg', 'ACCOUNT_KEY=$accountKey', '.']
 
   # Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
