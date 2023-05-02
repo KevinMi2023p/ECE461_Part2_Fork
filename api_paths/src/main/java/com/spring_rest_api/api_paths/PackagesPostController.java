@@ -40,6 +40,7 @@ import org.json.JSONObject;
 
 @RestController
 public class PackagesPostController {
+    private final ResponseEntity<String> badRequestError = ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
 
     private final Logger logger;
 
