@@ -44,7 +44,7 @@ public class PackagesQueryService {
     private List<String> get_nums_from_string(String v_query) {
         List<String> result = new ArrayList<String>();
 
-        // Why double backslash on this regex
+        // Why double backslash on this regex even though it's not normal
         // https://stackoverflow.com/questions/22218350/invalid-escape-sequence-valid-ones-are-b-t-n-f-r-in-java
         Pattern pattern = Pattern.compile("[0-9]\\.[0-9]\\.[0-9]");
         Matcher match = pattern.matcher(v_query);
@@ -58,8 +58,10 @@ public class PackagesQueryService {
     public List<Map<String, Object>> pagnitatedqueries(List<PagQuery> pagQuerys) throws ExecutionException, InterruptedException {
         // Note, there is no OR query for Java on Firestore
 
+        // We add all the packages we find here
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 
+        // We're going to have to go through each different query, since they're seperate queries
         for(PagQuery pags : pagQuerys) {
             Query query = collectionReference.whereEqualTo(NameField, pags.get_Name());
             String version_query = pags.get_Version();
@@ -94,7 +96,6 @@ public class PackagesQueryService {
                 Map<String,Object> metaData = (Map<String, Object>) document.getData().get("metadata");
                 result.add(metaData);
             }
-            // System.out.println("------new pq------");
         }
 
         return result;
