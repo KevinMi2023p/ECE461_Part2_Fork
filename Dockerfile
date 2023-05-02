@@ -10,10 +10,10 @@ COPY . /app
 RUN echo $API_KEY | tee api_paths/src/main/resources/githubToken.txt
 RUN sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
 
-# RUN echo "${ACCOUNT_KEY}" | base64 --decode > /app/accountKey.json
-# RUN echo "$(cat /app/accountKey.json)"
-# ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
-
+RUN echo "${ACCOUNT_KEY}" | base64 --decode > /app/accountKey.json
+RUN echo "$(cat /app/accountKey.json)"
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
+ENV GOOGLE_CLOUD_PROJECT="teamfirestorm-61564"
 RUN mvn -f /app/api_paths/pom.xml clean package
 
 # Use an Ubuntu base image that includes glibc and other necessary tools
@@ -82,6 +82,8 @@ RUN apt-get update && \
 # The following commands are supposed to get BUILD ARG variables and store them in accountKey.json
 
 # ENV LD_LIBRARY_PATH=/usr/lib
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
+ENV GOOGLE_CLOUD_PROJECT="teamfirestorm-61564"
 RUN ls
 
 RUN ls /usr/lib && echo "Contents of /usr/lib listed above."

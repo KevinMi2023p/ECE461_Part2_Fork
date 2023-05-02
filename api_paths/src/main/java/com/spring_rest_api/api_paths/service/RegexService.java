@@ -27,6 +27,7 @@ public class RegexService {
     // private final String fieldToCheck = "metadata.Name";
     
     @NonNull
+    
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
 
 
