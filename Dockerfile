@@ -70,10 +70,10 @@ COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
 # COPY --from=build /usr/lib/libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
 
-RUN echo "${ACCOUNT_KEY}" | base64 --decode > /app/accountKey.json
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
+RUN echo "${ACCOUNT_KEY}" | base64 --decode > accountKey.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=accountKey.json
 # ENV LD_LIBRARY_PATH=/usr/lib
-RUN cat app/accountKey.json
+RUN ls
 
 RUN ls /usr/lib && echo "Contents of /usr/lib listed above."
 RUN ls /usr/lib/libpackageanalyze.so && ls /usr/lib/libNetScoreUtil.so || echo "Required files not found in /usr/lib directory"
