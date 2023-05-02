@@ -75,7 +75,7 @@ public class PackagesQueryService {
         return result;
     }
 
-    public List<Map<String, Object>> pagnitatedqueries(List<PagQuery> pagQuerys, int limit_return) throws ExecutionException, InterruptedException {
+    public List<Map<String, Object>> pagnitatedqueries(List<PagQuery> pagQuerys) throws ExecutionException, InterruptedException {
         // Note, there is no OR query for Java on Firestore
 
         // We add all the packages we find here
@@ -105,7 +105,7 @@ public class PackagesQueryService {
             } else if (nums_found.size() == 2) {
                 query = query.whereEqualTo(VersionField, nums_found.get(0) + "-" + nums_found.get(1));
             } else {
-                // This condition will never hit
+                // This condition will probably never hit unless the query is invalid
                 return null;
             }
             
@@ -113,10 +113,6 @@ public class PackagesQueryService {
             for (DocumentSnapshot document : future.get().getDocuments()) {
                 Map<String,Object> metaData = (Map<String, Object>) document.getData().get("metadata");
                 result.add(metaData);
-            }
-
-            if (result.size() > limit_return) {
-                return null;
             }
         }
 

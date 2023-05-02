@@ -1,5 +1,6 @@
 package com.spring_rest_api.api_paths;
 
+import com.google.api.gax.rpc.InternalException;
 import com.google.gson.Gson;
 import com.spring_rest_api.api_paths.entity.Data;
 import com.spring_rest_api.api_paths.entity.Metadata;
@@ -9,6 +10,9 @@ import com.spring_rest_api.api_paths.entity.encodedProduct;
 import com.spring_rest_api.api_paths.service.AuthenticateService;
 import com.spring_rest_api.api_paths.service.PackageService;
 import com.spring_rest_api.api_paths.service.PackagesQueryService;
+
+// import io.netty.handler.timeout.TimeoutException;
+// import io.netty.util.concurrent.Future;
 
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +31,21 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.io.*;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+// import org.apache.commons.compress.harmony.pack200.NewAttributeBands.Callable;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
@@ -42,6 +53,7 @@ import org.json.JSONObject;
 @RestController
 public class PackagesPostController {
     private final ResponseEntity<String> badRequestError = ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
+    private final ResponseEntity<String> tooLargeError = ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("Too many packages returned.");
 
     private final Logger logger;
 
@@ -70,15 +82,20 @@ public class PackagesPostController {
         if (packagesQueryService.checkValidQuery(pagQuerys) == false)
             return badRequestError;
 
-        
         // Above sections check if the parameters for the function are correct
-        int limit_number_of_packages = 20;
-        List<Map<String,Object>> result = packagesQueryService.pagnitatedqueries(pagQuerys, limit_number_of_packages);
-        if (result == null) 
-            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("Too many packages returned.");
-
-        
-        return ResponseEntity.ok(new Gson().toJson(result));
+        ExecutorService executor = Executors.newCachedThreadPool();
+        Callable<List<Map<String,Object>>> task = new Callable<List<Map<String,Object>>>() {
+            public List<Map<String,Object>> call() throws ExecutionException, InterruptedException {
+                return packagesQueryService.pagnitatedqueries(pagQuerys);
+            }
+        };
+        Future<List<Map<String,Object>>> future = executor.submit(task);
+        try {
+            List<Map<String,Object>> result = future.get(7, TimeUnit.SECONDS);
+            return (result == null) ? badRequestError : ResponseEntity.ok(new Gson().toJson(result));
+        } catch (TimeoutException ex) {
+            return tooLargeError;
+        }
     }
 
     @PostMapping(value = "/package", produces = "application/json")
