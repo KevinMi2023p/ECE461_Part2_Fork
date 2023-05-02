@@ -1,5 +1,6 @@
 package com.spring_rest_api.api_paths;
 
+import com.google.gson.Gson;
 import com.spring_rest_api.api_paths.entity.Data;
 import com.spring_rest_api.api_paths.entity.Metadata;
 import com.spring_rest_api.api_paths.entity.PagQuery;
@@ -63,7 +64,9 @@ public class PackagesPostController {
             return badRequestError;
         
         List<Map<String,Object>> result = packagesQueryService.pagnitatedqueries(pagQuerys);
-        return null;
+        if (result == null) 
+            return badRequestError;
+        return ResponseEntity.ok(new Gson().toJson(result));
     }
 
     @PostMapping(value = "/package", produces = "application/json")
