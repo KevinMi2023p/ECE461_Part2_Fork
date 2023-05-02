@@ -10,7 +10,7 @@ COPY . /app
 RUN echo $API_KEY | tee api_paths/src/main/resources/githubToken.txt
 RUN sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
 
-RUN echo "${ACCOUNT_KEY}" | base64 --decode | jq '.' > /app/accountKey.json
+RUN echo "${ACCOUNT_KEY}" | base64 --decode > /app/accountKey.json
 RUN echo "$(cat /app/accountKey.json)"
 ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
 
