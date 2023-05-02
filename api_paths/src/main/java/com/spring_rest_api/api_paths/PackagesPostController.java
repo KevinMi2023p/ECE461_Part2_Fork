@@ -59,17 +59,28 @@ public class PackagesPostController {
     }
     
     @PostMapping(value = "/packages", produces = "application/json")
-    public ResponseEntity<String> packages_plurual(@RequestBody List<PagQuery> pagQuerys, @RequestHeader("X-Authorization") String token, @RequestParam("offset") String offset) throws ExecutionException, InterruptedException {
+    public ResponseEntity<String> packages_plurual(@RequestBody List<PagQuery> pagQuerys, @RequestHeader("X-Authorization") String token, @RequestParam("offset") String offsetVar) throws ExecutionException, InterruptedException {
         if (!validateToken(token))
             return badRequestError;
+
+        int offset = 0;
+        try {
+            offset = Integer.parseInt(offsetVar);
+        } catch (NumberFormatException e) {
+            return badRequestError;
+        }
         
         if (packagesQueryService.checkValidQuery(pagQuerys) == false)
             return badRequestError;
 
+        
+        // Above sections check if the parameters for the function are correct
         int limit_number_of_packages = 20;
         List<Map<String,Object>> result = packagesQueryService.pagnitatedqueries(pagQuerys, limit_number_of_packages);
         if (result == null) 
             return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("Too many packages returned.");
+
+        
         return ResponseEntity.ok(new Gson().toJson(result));
     }
 
