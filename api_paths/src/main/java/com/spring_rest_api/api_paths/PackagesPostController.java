@@ -68,8 +68,7 @@ public class PackagesPostController {
     @PostMapping(value = "/package", produces = "application/json")
     public ResponseEntity<String> package_single(@RequestBody encodedProduct encode ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException , MalformedURLException, IOException {
         if (!validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
-
+            return badRequestError;
         }
         System.out.println("encode URL " + encode.URL + " encode content " + encode.Content + "encode jsprogram" + encode.JSProgram);
         logger.debug("Token Value: {}",token);
@@ -79,7 +78,7 @@ public class PackagesPostController {
         // Content and URL are both set
         if (encode.getContent() != null && encode.getURL() != null) {
             System.out.println("encode URL " + encode.URL + " encode content " + encode.Content + "encode jsprogram" + encode.JSProgram);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.");
+            return badRequestError;
         }
         // Content is not set and URL is set
         if (encode.getContent() == null && encode.getURL() != null) {
@@ -147,7 +146,7 @@ public class PackagesPostController {
                 throw new RuntimeException(e);
             }
             if (exists == 0) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.");
+                return badRequestError;
             } else {
                 System.out.println(product.getData().getContent().length());
                 String str = packageService.savePackage(product);
@@ -202,7 +201,7 @@ public class PackagesPostController {
                 throw new RuntimeException(e);
             }
             if (exists == 0) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.");
+                return badRequestError;
             } else {
                 String str = packageService.savePackage(product);
                 if (str == "Package exists already") {
