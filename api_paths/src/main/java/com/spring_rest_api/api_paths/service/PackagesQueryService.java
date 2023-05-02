@@ -61,6 +61,11 @@ public class PackagesQueryService {
             Query query = collectionReference.whereEqualTo(NameField, pags.get_Name());
             String version_query = pags.get_Version();
 
+            Integer type_of_query = this.type_of_query(version_query);
+            if (type_of_query == -1) {
+                return null; // invalid request
+            }
+            
             List<String> nums_found = this.get_nums_from_string(version_query);
 
             if (nums_found.size() == 1) {
