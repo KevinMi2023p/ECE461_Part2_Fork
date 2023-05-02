@@ -50,7 +50,7 @@ jobs:
 
       - name: Echo contents of main directory
         run: ls
-        
+
       - name: Docker login
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
@@ -62,7 +62,7 @@ jobs:
       - name: Build for Docker
         run: |
           echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 --decode > accountKey.json
-          docker build --no-cache -t my-docker-image .
+          docker build --no-cache -t my-docker-image --build-arg API_KEY=$API_KEY .
           docker images
           docker run --rm -d -p 8080:8080 --name my-docker-container my-docker-image
           sleep 30

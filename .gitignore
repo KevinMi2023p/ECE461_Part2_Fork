@@ -13,3 +13,4 @@
 accountKey.json
 /cli/libpackageanalyze.so
 libNetScoreUtil.so
+/cli/com_*_NetScoreUtil.h

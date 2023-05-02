@@ -9,7 +9,7 @@ COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 RUN mvn -f /app/api_paths/pom.xml clean package
 
 # Use an Ubuntu base image that includes glibc and other necessary tools
-FROM ubuntu:20.04
+FROM openjdk:17-jdk-slim-buster
 
 # Define the API_KEY build-time substitution variable
 ARG API_KEY
@@ -18,9 +18,9 @@ ARG API_KEY
 ENV API_KEY=${API_KEY}
 
 # Install necessary dependencies and OpenJDK 17
-RUN apt-get update && \
-    apt-get install -y openjdk-17-jdk && \
-    rm -rf /var/lib/apt/lists/*
+# RUN apt-get update && \
+#     apt-get install -y openjdk-17-jdk && \
+#     rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install build-essential -y
 # Copy the jar to the production image from the build stage.
