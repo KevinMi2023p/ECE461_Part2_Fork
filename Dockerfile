@@ -1,97 +1,72 @@
-# Use the official maven/Java 17 image to create a build artifact.
-FROM maven:3.8.3-openjdk-17-slim AS build
-WORKDIR /app
-COPY . /app
-
-# COPY ./cli/libpackageanalyze.so /usr/lib/libpackageanalyze.so
-# COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
-
-# adding the github token needed for package Controller
-RUN echo $API_KEY | tee api_paths/src/main/resources/githubToken.txt
-RUN sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
-
-RUN echo "${ACCOUNT_KEY}" | base64 --decode > /app/accountKey.json
-RUN echo "$(cat /app/accountKey.json)"
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
-ENV GOOGLE_CLOUD_PROJECT="teamfirestorm-61564"
-RUN mvn -f /app/api_paths/pom.xml clean package
-
 # Use an Ubuntu base image that includes glibc and other necessary tools
 FROM ubuntu:20.04
 
-# Define the API_KEY build-time substitution variable
+# Set the working directory to /app
+WORKDIR /app
+
+# Copy the contents of the current directory to /app
+COPY . /app
+
+# Define the API_KEY and ACCOUNT_KEY build-time substitution variables
 ARG API_KEY
 ARG ACCOUNT_KEY
 
-# Set the API_KEY environment variable
+# Set the API_KEY environment variable and write it to a file
 ENV API_KEY=${API_KEY}
+RUN echo $API_KEY | tee api_paths/src/main/resources/githubToken.txt
+RUN sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
 
+# Install necessary tools and dependencies
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
         openjdk-17-jdk \
-        maven \
         build-essential \
-        wget && \
+        wget \
+        jq && \
     rm -rf /var/lib/apt/lists/*
 
-# Setup Process
+RUN wget https://dlcdn.apache.org/maven/maven-3/3.9.1/binaries/apache-maven-3.9.1-bin.tar.gz && \
+    tar -xvzf apache-maven-3.9.1-bin.tar.gz && \
+    mv apache-maven-3.9.1 /usr/local/maven && \
+    rm apache-maven-3.9.1-bin.tar.gz
+
+# Set the environment variables for Maven
+ENV M2_HOME=/usr/local/maven
+ENV PATH=${M2_HOME}/bin:${PATH}
+
+# Setup Go environment
 RUN wget https://go.dev/dl/go1.20.3.linux-amd64.tar.gz && \
     rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.3.linux-amd64.tar.gz
-
-
-
 ENV PATH="/usr/local/go/bin:${PATH}"
 ENV GOROOT="/usr/local/go"
 ENV GOPATH="$HOME/go"
 ENV PATH="$GOPATH/bin:$GOROOT/bin:$PATH"
 ENV JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
 
-WORKDIR /app
-COPY . /app
-
-# Building lib files
+# Build and install shared library files
 RUN cd cli && \
     go mod tidy && \
     go build -o libpackageanalyze.so -buildmode=c-shared main.go && \
-    ls && \
     cp libpackageanalyze.* /usr/lib && \
     cd .. 
 
 RUN javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
-
 RUN g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /usr/lib/libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
 
-# Copy the jar to the production image from the build stage.
-COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
+# Build the application
+RUN mvn -f /app/api_paths/pom.xml dependency:purge-local-repository clean package
 
-# Following Install jq for json verification
-RUN apt-get update && \
-    apt-get install -y jq && \
-    rm -rf /var/lib/apt/lists/*
+# Copy the JAR file to /app
+COPY api_paths/target/ece461-part2.jar /app/app.jar
 
-# The lines below the comment are needed when trying to run with the dockerizeSpringBoot.yml
-
-# COPY --from=build /app/accountKey.json /app/accountKey.json
-# ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
-
-# The following lines will be needed when not setting up lib files in Docker.
-
-# COPY --from=build /usr/lib/libpackageanalyze.so /usr/lib/libpackageanalyze.so
-# COPY --from=build /usr/lib/libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
-
-# The following commands are supposed to get BUILD ARG variables and store them in accountKey.json
-
-# ENV LD_LIBRARY_PATH=/usr/lib
+# Set the path to the Google Cloud service account key and project ID
+RUN echo "${ACCOUNT_KEY}" | base64 --decode > /app/accountKey.json
 ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
 ENV GOOGLE_CLOUD_PROJECT="teamfirestorm-61564"
-RUN ls
 
+# Verify that necessary files are present in /usr/lib
 RUN ls /usr/lib && echo "Contents of /usr/lib listed above."
 RUN ls /usr/lib/libpackageanalyze.so && ls /usr/lib/libNetScoreUtil.so || echo "Required files not found in /usr/lib directory"
 
-# ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
-# ENV JAVA_TOOL_OPTIONS -Djava.library.path=/usr/lib
-
-# Run the web service on container startup.
-CMD ["java", "-Djava.security.egd=file:/dev/./urandom",  "-jar", "/app/app.jar"]
-
+# Run the web service on container startup
+CMD ["/bin/bash", "-c", "cat accountKey.json && cat api_paths/src/main/resources/githubToken.txt && echo 'API_KEY'=${API_KEY} && echo 'ACCOUNT_KEY'=${ACCOUNT_KEY} && java -Djava.security.egd=file:/dev/./urandom -jar /app/app.jar"]
