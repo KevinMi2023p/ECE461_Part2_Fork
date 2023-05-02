@@ -58,6 +58,10 @@ RUN g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /us
 # Copy the jar to the production image from the build stage.
 COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
 
+# Following Install jq for json verification
+RUN apt-get update && \
+    apt-get install -y jq && \
+    rm -rf /var/lib/apt/lists/*
 
 # The lines below the comment are needed when trying to run with the dockerizeSpringBoot.yml
 
@@ -70,7 +74,7 @@ COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
 # COPY --from=build /usr/lib/libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
 # The following commands are supposed to get BUILD ARG variables and store them in accountKey.json
-RUN echo "${ACCOUNT_KEY}" | base64 --decode >> accountKey.json
+RUN echo "${ACCOUNT_KEY}" | base64 --decode | jq '.' > accountKey.json
 RUN cat accountKey.json
 ENV GOOGLE_APPLICATION_CREDENTIALS=accountKey.json
 # ENV LD_LIBRARY_PATH=/usr/lib
