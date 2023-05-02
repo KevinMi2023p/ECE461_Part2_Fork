@@ -58,11 +58,12 @@ public class PackagesPostController {
     }
     
     @PostMapping(value = "/packages", produces = "application/json")
-    public List<Map<String,Object>> packages_plurual(@RequestBody List<PagQuery> pagQuerys) throws ExecutionException, InterruptedException {
-        // System.out.println("Packages!");
-        // System.out.println(pagQuery.get_Name() + " " + pagQuery.get_Version());
+    public ResponseEntity<String> packages_plurual(@RequestBody List<PagQuery> pagQuerys, @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
+        if (!validateToken(token))
+            return badRequestError;
+        
         List<Map<String,Object>> result = packagesQueryService.pagnitatedqueries(pagQuerys);
-        return result;
+        return null;
     }
 
     @PostMapping(value = "/package", produces = "application/json")
