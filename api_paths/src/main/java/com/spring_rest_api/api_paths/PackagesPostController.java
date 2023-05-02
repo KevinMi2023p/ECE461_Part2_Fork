@@ -10,7 +10,6 @@ import com.spring_rest_api.api_paths.service.AuthenticateService;
 import com.spring_rest_api.api_paths.service.PackageService;
 import com.spring_rest_api.api_paths.service.PackagesQueryService;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -19,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class PackagesPostController {
     }
     
     @PostMapping(value = "/packages", produces = "application/json")
-    public ResponseEntity<String> packages_plurual(@RequestBody List<PagQuery> pagQuerys, @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
+    public ResponseEntity<String> packages_plurual(@RequestBody List<PagQuery> pagQuerys, @RequestHeader("X-Authorization") String token, @RequestParam("offset") String offset) throws ExecutionException, InterruptedException {
         if (!validateToken(token))
             return badRequestError;
         
