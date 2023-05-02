@@ -1,0 +1,11 @@
+version: '3'
+services:
+  my-service:
+    build:
+      context: .
+      args:
+        API_KEY: ${API_KEY}
+        ACCOUNT_KEY: ${accountKey}
+    image: my-docker-image
+    ports:
+      - "8080:8080"

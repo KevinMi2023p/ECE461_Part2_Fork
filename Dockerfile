@@ -20,11 +20,6 @@ ARG ACCOUNT_KEY
 # Set the API_KEY environment variable
 ENV API_KEY=${API_KEY}
 
-# Install necessary dependencies and OpenJDK 17
-# RUN apt-get update && \
-#     apt-get install -y openjdk-17-jdk && \
-#     rm -rf /var/lib/apt/lists/*
-
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         openjdk-17-jdk \
@@ -63,14 +58,19 @@ RUN g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /us
 # Copy the jar to the production image from the build stage.
 COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
 
-# RUN echo "$GOOGLE_APPLICATION_CREDENTIALS" | base64 --decode > /app/accountKey.json
+
+# The lines below the comment are needed when trying to run with the dockerizeSpringBoot.yml
 
 # COPY --from=build /app/accountKey.json /app/accountKey.json
+# ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
+
+# The following lines will be needed when not setting up lib files in Docker.
+
 # COPY --from=build /usr/lib/libpackageanalyze.so /usr/lib/libpackageanalyze.so
 # COPY --from=build /usr/lib/libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
-
-RUN echo ${ACCOUNT_KEY} > accountKey.json
+# The following commands are supposed to get BUILD ARG variables and store them in accountKey.json
+RUN echo "${ACCOUNT_KEY}" | base64 --decode >> accountKey.json
 RUN cat accountKey.json
 ENV GOOGLE_APPLICATION_CREDENTIALS=accountKey.json
 # ENV LD_LIBRARY_PATH=/usr/lib
