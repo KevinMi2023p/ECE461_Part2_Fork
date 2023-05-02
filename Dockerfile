@@ -6,6 +6,9 @@ COPY . /app
 # COPY ./cli/libpackageanalyze.so /usr/lib/libpackageanalyze.so
 # COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
+# adding the github token needed for package Controller
+RUN echo $API_KEY | tee api_paths/src/main/resources/githubToken.txt
+RUN sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
 
 
 RUN mvn -f /app/api_paths/pom.xml clean package
@@ -74,9 +77,9 @@ RUN apt-get update && \
 # COPY --from=build /usr/lib/libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
 # The following commands are supposed to get BUILD ARG variables and store them in accountKey.json
-RUN echo "${ACCOUNT_KEY}" | base64 --decode | jq '.' > accountKey.json
-RUN cat accountKey.json
-ENV GOOGLE_APPLICATION_CREDENTIALS=accountKey.json
+RUN echo "${ACCOUNT_KEY}" | base64 --decode | jq '.' > /app/accountKey.json
+RUN cat /app/accountKey.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
 # ENV LD_LIBRARY_PATH=/usr/lib
 RUN ls
 
