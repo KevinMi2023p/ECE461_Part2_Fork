@@ -9,3 +9,7 @@
 
 ## Account Key ##
 **/serviceAccountKey.json
+
+accountKey.json
+/cli/libpackageanalyze.so
+libNetScoreUtil.so

@@ -60,12 +60,14 @@ public class PackagesPostController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
 
         }
+        System.out.println("encode URL " + encode.URL + " encode content " + encode.Content + "encode jsprogram" + encode.JSProgram);
         logger.debug("Token Value: {}",token);
         logger.debug("URL value: {}",encode.URL);
         //packageService.savePackage(product);
 
         // Content and URL are both set
         if (encode.getContent() != null && encode.getURL() != null) {
+            System.out.println("encode URL " + encode.URL + " encode content " + encode.Content + "encode jsprogram" + encode.JSProgram);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.");
         }
         // Content is not set and URL is set
