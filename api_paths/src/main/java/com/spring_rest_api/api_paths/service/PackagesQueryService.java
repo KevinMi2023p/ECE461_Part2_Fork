@@ -78,6 +78,7 @@ public class PackagesQueryService {
 
             Integer type_of_query = this.type_of_query(version_query);
 
+            // Return list of version numbers found, group is reference to regex group
             List<String> nums_found = this.get_nums_from_string(version_query);
 
             // Single number section
