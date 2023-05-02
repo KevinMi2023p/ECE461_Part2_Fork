@@ -9,7 +9,7 @@ COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 RUN mvn -f /app/api_paths/pom.xml clean package
 
 # Use an Ubuntu base image that includes glibc and other necessary tools
-FROM ubuntu:21.04
+FROM ubuntu:20.04
 
 # Define the API_KEY build-time substitution variable
 ARG API_KEY
