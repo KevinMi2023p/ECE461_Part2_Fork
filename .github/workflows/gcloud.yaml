@@ -1,74 +1,74 @@
-name: Build and Deploy to App Engine
+# name: Build and Deploy to App Engine
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v2
 
-    - name: Set up GCC
-      uses: egor-tensin/setup-gcc@v1
-      with:
-        version: latest
-        platform: x64
+#     - name: Set up GCC
+#       uses: egor-tensin/setup-gcc@v1
+#       with:
+#         version: latest
+#         platform: x64
 
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.19
+#     - name: Set up Go
+#       uses: actions/setup-go@v3
+#       with:
+#         go-version: 1.19
 
-    - name: Build golib
-      run: |
-        cd cli
-        go build -o libpackageanalyze.so -buildmode=c-shared main.go 
-        sudo cp libpackageanalyze.* /usr/lib
-        cd ..
+#     - name: Build golib
+#       run: |
+#         cd cli
+#         go build -o libpackageanalyze.so -buildmode=c-shared main.go 
+#         sudo cp libpackageanalyze.* /usr/lib
+#         cd ..
 
-    - name: Build jheader
-      run: javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
+#     - name: Build jheader
+#       run: javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
 
-    - name: Build clib
-      run: sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
+#     - name: Build clib
+#       run: sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
 
-    - name: Set up Java
-      uses: actions/setup-java@v1
-      with:
-        java-version: '17'
-        distribution: 'adopt'
+#     - name: Set up Java
+#       uses: actions/setup-java@v1
+#       with:
+#         java-version: '17'
+#         distribution: 'adopt'
 
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1.1.0
-      with:
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
+#     - name: Set up Cloud SDK
+#       uses: google-github-actions/setup-gcloud@v1.1.0
+#       with:
+#         service_account_key: ${{ secrets.GCP_SA_KEY }}
+#         project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-    - name: Authenticate with Google Cloud
-      uses: google-github-actions/auth@v1
-      with:
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
+#     - name: Authenticate with Google Cloud
+#       uses: google-github-actions/auth@v1
+#       with:
+#         credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-    - name: Create the Github token txt file.
-      run: |
-        echo ${{ secrets.GITHUBTOKEN }} | tee api_paths/src/main/resources/githubToken.txt
-        sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
+#     - name: Create the Github token txt file.
+#       run: |
+#         echo ${{ secrets.GITHUBTOKEN }} | tee api_paths/src/main/resources/githubToken.txt
+#         sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
 
-    - name: Build JAR file
-      run: mvn package
-      working-directory: api_paths
-      env:
-        JAVA_HOME: ${{ env.JAVA_HOME }}
+#     - name: Build JAR file
+#       run: mvn package
+#       working-directory: api_paths
+#       env:
+#         JAVA_HOME: ${{ env.JAVA_HOME }}
 
-    - name: Deploy to App Engine
-      uses: google-github-actions/deploy-appengine@v1
-      with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        working_directory: api_paths
-        credentials: ${{ secrets.GCP_SA_KEY }}
+#     - name: Deploy to App Engine
+#       uses: google-github-actions/deploy-appengine@v1
+#       with:
+#         project_id: ${{ secrets.GCP_PROJECT_ID }}
+#         working_directory: api_paths
+#         credentials: ${{ secrets.GCP_SA_KEY }}
 
