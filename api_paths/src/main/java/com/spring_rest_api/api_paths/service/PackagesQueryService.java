@@ -27,6 +27,16 @@ public class PackagesQueryService {
     private final String types[] = {"Exact", "Bounded range", "Carat", "Tilde"};
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
 
+    // Check if a String can be converted in int
+    public int checkValidQueryVar(String input) {
+        int offset = 0;
+        try {
+            offset = Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+        return offset;
+    }
 
     // Will Check if the Queries are valid before actually executing them
     public boolean checkValidQuery(List<PagQuery> list_pagQueries) {

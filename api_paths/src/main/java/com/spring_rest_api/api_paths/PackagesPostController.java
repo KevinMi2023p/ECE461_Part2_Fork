@@ -63,12 +63,9 @@ public class PackagesPostController {
         if (!validateToken(token))
             return badRequestError;
 
-        int offset = 0;
-        try {
-            offset = Integer.parseInt(offsetVar);
-        } catch (NumberFormatException e) {
+        int offset = packagesQueryService.checkValidQueryVar(offsetVar);
+        if (offset < 0)
             return badRequestError;
-        }
         
         if (packagesQueryService.checkValidQuery(pagQuerys) == false)
             return badRequestError;
