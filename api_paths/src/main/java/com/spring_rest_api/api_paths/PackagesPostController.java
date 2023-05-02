@@ -64,7 +64,7 @@ public class PackagesPostController {
         return result;
     }
 
-    @PostMapping("/package")
+    @PostMapping(value = "/package", produces = "application/json")
     public ResponseEntity<String> package_single(@RequestBody encodedProduct encode ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException , MalformedURLException, IOException {
         if (!validateToken(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
