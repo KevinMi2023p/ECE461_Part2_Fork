@@ -83,6 +83,9 @@ public class PackagesPostController {
             return badRequestError;
 
         // Above sections check if the parameters for the function are correct
+
+
+        // Section below will run the queries, if it takes longer than 5 seconds it times out
         ExecutorService executor = Executors.newCachedThreadPool();
         Callable<List<Map<String,Object>>> task = new Callable<List<Map<String,Object>>>() {
             public List<Map<String,Object>> call() throws ExecutionException, InterruptedException {
@@ -91,7 +94,7 @@ public class PackagesPostController {
         };
         Future<List<Map<String,Object>>> future = executor.submit(task);
         try {
-            List<Map<String,Object>> result = future.get(7, TimeUnit.SECONDS);
+            List<Map<String,Object>> result = future.get(5, TimeUnit.SECONDS);
             return (result == null) ? badRequestError : ResponseEntity.ok(new Gson().toJson(result));
         } catch (TimeoutException ex) {
             return tooLargeError;
