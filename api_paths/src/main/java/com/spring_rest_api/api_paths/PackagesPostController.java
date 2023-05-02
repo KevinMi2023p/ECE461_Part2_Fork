@@ -63,6 +63,9 @@ public class PackagesPostController {
         if (!validateToken(token))
             return badRequestError;
         
+        if (packagesQueryService.checkValidQuery(pagQuerys) == false)
+            return badRequestError;
+
         List<Map<String,Object>> result = packagesQueryService.pagnitatedqueries(pagQuerys);
         if (result == null) 
             return badRequestError;
