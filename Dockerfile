@@ -87,6 +87,7 @@ RUN ls
 RUN ls /usr/lib && echo "Contents of /usr/lib listed above."
 RUN ls /usr/lib/libpackageanalyze.so && ls /usr/lib/libNetScoreUtil.so || echo "Required files not found in /usr/lib directory"
 
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
 # ENV JAVA_TOOL_OPTIONS -Djava.library.path=/usr/lib
 
 # Run the web service on container startup.
