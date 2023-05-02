@@ -1,4 +1,4 @@
-# Use the official openjdk/Java 17 image to create a build artifact.
+# Use the official maven/Java 17 image to create a build artifact.
 FROM maven:3.8.3-openjdk-17-slim AS build
 WORKDIR /app
 COPY . /app
@@ -8,14 +8,19 @@ COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
 RUN mvn -f /app/api_paths/pom.xml clean package
 
-# Use a base image that includes glibc
-FROM maven:3.8.3-openjdk-17-slim
+# Use an Ubuntu base image that includes glibc and other necessary tools
+FROM ubuntu:20.04
 
 # Define the API_KEY build-time substitution variable
 ARG API_KEY
 
 # Set the API_KEY environment variable
 ENV API_KEY=${API_KEY}
+
+# Install necessary dependencies and OpenJDK 17
+RUN apt-get update && \
+    apt-get install -y openjdk-17-jdk && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the jar to the production image from the build stage.
 COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
