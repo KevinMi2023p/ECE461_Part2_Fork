@@ -70,7 +70,7 @@ COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
 # COPY --from=build /usr/lib/libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
 
-RUN echo '${ACCOUNT_KEY}' > accountKey.json
+RUN echo ${ACCOUNT_KEY} > accountKey.json
 RUN cat accountKey.json
 ENV GOOGLE_APPLICATION_CREDENTIALS=accountKey.json
 # ENV LD_LIBRARY_PATH=/usr/lib
