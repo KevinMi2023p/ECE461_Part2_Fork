@@ -75,7 +75,7 @@ public class PackagesQueryService {
         return result;
     }
 
-    public List<Map<String, Object>> pagnitatedqueries(List<PagQuery> pagQuerys) throws ExecutionException, InterruptedException {
+    public List<Map<String, Object>> pagnitatedqueries(List<PagQuery> pagQuerys, int offset) throws ExecutionException, InterruptedException {
         // Note, there is no OR query for Java on Firestore
 
         // We add all the packages we find here
@@ -116,6 +116,6 @@ public class PackagesQueryService {
             }
         }
 
-        return result;
+        return (offset >= result.size()) ? null : result.subList(offset, result.size());
     }
 }

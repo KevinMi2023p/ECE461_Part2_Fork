@@ -89,7 +89,7 @@ public class PackagesPostController {
         ExecutorService executor = Executors.newCachedThreadPool();
         Callable<List<Map<String,Object>>> task = new Callable<List<Map<String,Object>>>() {
             public List<Map<String,Object>> call() throws ExecutionException, InterruptedException {
-                return packagesQueryService.pagnitatedqueries(pagQuerys);
+                return packagesQueryService.pagnitatedqueries(pagQuerys, offset);
             }
         };
         Future<List<Map<String,Object>>> future = executor.submit(task);
