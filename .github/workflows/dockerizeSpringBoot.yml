@@ -1,114 +1,114 @@
-# name: Containerizing Spring Boot Application
+name: Containerizing Spring Boot Application
 
-# on:
-#   push:
-#     branches: [ main ]
-#   pull_request:
-#     branches: [ main ]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
-# env:
-#   API_KEY: '${{ secrets.API_KEY }}'
+env:
+  API_KEY: '${{ secrets.API_KEY }}'
 
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-#       # - name: Set up GCC
-#       #   uses: egor-tensin/setup-gcc@v1
-#       #   with:
-#       #     version: latest
-#       #     platform: x64
+      # - name: Set up GCC
+      #   uses: egor-tensin/setup-gcc@v1
+      #   with:
+      #     version: latest
+      #     platform: x64
 
-#       # - name: Set up Go
-#       #   uses: actions/setup-go@v3
-#       #   with:
-#       #     go-version: 1.19
+      # - name: Set up Go
+      #   uses: actions/setup-go@v3
+      #   with:
+      #     go-version: 1.19
 
-#       # - name: Build golib
-#       #   run: |
-#       #     cd cli
-#       #     go build -o libpackageanalyze.so -buildmode=c-shared main.go
-#       #     sudo cp libpackageanalyze.* /usr/lib
-#       #     cd ..
+      # - name: Build golib
+      #   run: |
+      #     cd cli
+      #     go build -o libpackageanalyze.so -buildmode=c-shared main.go
+      #     sudo cp libpackageanalyze.* /usr/lib
+      #     cd ..
 
-#       # - name: Echo contents of cli directory
-#       #   run: ls cli
+      # - name: Echo contents of cli directory
+      #   run: ls cli
 
-#       # - name: Set up Java
-#       #   uses: actions/setup-java@v1
-#       #   with:
-#       #     java-version: '17'
+      # - name: Set up Java
+      #   uses: actions/setup-java@v1
+      #   with:
+      #     java-version: '17'
 
-#       # - name: Build jheader
-#       #   run: javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
+      # - name: Build jheader
+      #   run: javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
 
-#       # - name: Build clib
-#       #   run: sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
+      # - name: Build clib
+      #   run: sudo g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
 
-#       # - name: Echo contents of main directory
-#       #   run: ls
+      # - name: Echo contents of main directory
+      #   run: ls
 
-#       # - name: Docker login
-#       #   run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+      # - name: Docker login
+      #   run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
-#       - name: Create the Github token txt file.
-#         run: |
-#           echo ${{ secrets.GITHUBTOKEN }} | tee api_paths/src/main/resources/githubToken.txt
-#           sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
+      - name: Create the Github token txt file.
+        run: |
+          echo ${{ secrets.GITHUBTOKEN }} | tee api_paths/src/main/resources/githubToken.txt
+          sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
 
-#       # - name: Build for Docker
-#       #   run: |
-#       #     echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 --decode > accountKey.json
-#       #     docker build --no-cache -t my-docker-image --build-arg API_KEY=$API_KEY .
-#       #     docker images
-#       #     docker run --rm -d -p 8080:8080 --name my-docker-container my-docker-image
-#       #     sleep 30
+      # - name: Build for Docker
+      #   run: |
+      #     echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 --decode > accountKey.json
+      #     docker build --no-cache -t my-docker-image --build-arg API_KEY=$API_KEY .
+      #     docker images
+      #     docker run --rm -d -p 8080:8080 --name my-docker-container my-docker-image
+      #     sleep 30
 
-#       # - name: Get container ID
-#       #   run: |
-#       #     container_id=$(docker ps -aqf "name=my-docker-container")
-#       #     echo "container_id=$container_id" >> $GITHUB_ENV
+      # - name: Get container ID
+      #   run: |
+      #     container_id=$(docker ps -aqf "name=my-docker-container")
+      #     echo "container_id=$container_id" >> $GITHUB_ENV
 
-#       # - name: Print Docker container logs
-#       #   run: |
-#       #     container_id=$(docker ps -aqf "name=my-docker-container")
-#       #     if [ -n "$container_id" ]; then
-#       #       docker logs $container_id
-#       #     else
-#       #       echo "Container 'my-docker-container' not found or has exited early."
-#       #     fi
+      # - name: Print Docker container logs
+      #   run: |
+      #     container_id=$(docker ps -aqf "name=my-docker-container")
+      #     if [ -n "$container_id" ]; then
+      #       docker logs $container_id
+      #     else
+      #       echo "Container 'my-docker-container' not found or has exited early."
+      #     fi
 
-#       # - name: Verify Spring Boot application
-#       #   run: |
-#       #     curl http://localhost:8080/
+      # - name: Verify Spring Boot application
+      #   run: |
+      #     curl http://localhost:8080/
 
-#       # - name: Stop Docker container
-#       #   run: docker stop my-docker-container
+      # - name: Stop Docker container
+      #   run: docker stop my-docker-container
 
-#       - name: Set up Cloud SDK
-#         uses: google-github-actions/setup-gcloud@v1.1.0
-#         with:
-#           service_account_key: ${{ secrets.GCP_SA_KEY }}
-#           project_id: teamfirestorm-61564
-#           export_default_credentials: true
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1.1.0
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: teamfirestorm-61564
+          export_default_credentials: true
 
-#       - name: Authenticate with Google Cloud
-#         uses: google-github-actions/auth@v1
-#         with:
-#           credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-#       - name: Configure Docker for GCR
-#         run: gcloud auth configure-docker
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker
 
-#       - name: Build and push Docker image
-#         run: |
-#           echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 --decode > accountKey.json
-#           docker build -t gcr.io/teamfirestorm-61564/my-docker-image --build-arg API_KEY=$API_KEY .
-#           docker push gcr.io/teamfirestorm-61564/my-docker-image
+      - name: Build and push Docker image
+        run: |
+          echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 --decode > accountKey.json
+          docker build -t gcr.io/teamfirestorm-61564/my-docker-image --build-arg API_KEY=$API_KEY .
+          docker push gcr.io/teamfirestorm-61564/my-docker-image
 
-#       - name: Deploy to Cloud Run
-#         run: |
-#           gcloud run deploy my-service --image gcr.io/teamfirestorm-61564/my-docker-image --region us-central1 --platform managed --allow-unauthenticated
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy my-service --image gcr.io/teamfirestorm-61564/my-docker-image --region us-central1 --platform managed --allow-unauthenticated
