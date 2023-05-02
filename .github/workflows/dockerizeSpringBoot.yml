@@ -54,10 +54,10 @@ jobs:
       # - name: Docker login
       #   run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
-      # - name: Create the Github token txt file.
-      #   run: |
-      #     echo ${{ secrets.GITHUBTOKEN }} | tee api_paths/src/main/resources/githubToken.txt
-      #     sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
+      - name: Create the Github token txt file.
+        run: |
+          echo ${{ secrets.GITHUBTOKEN }} | tee api_paths/src/main/resources/githubToken.txt
+          sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
 
       # - name: Build for Docker
       #   run: |
@@ -105,6 +105,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
+          echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 --decode > accountKey.json
           docker build -t gcr.io/teamfirestorm-61564/my-docker-image --build-arg API_KEY=$API_KEY .
           docker push gcr.io/teamfirestorm-61564/my-docker-image
 
