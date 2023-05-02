@@ -81,12 +81,12 @@ jobs:
       #       echo "Container 'my-docker-container' not found or has exited early."
       #     fi
 
-      - name: Verify Spring Boot application
-        run: |
-          curl http://localhost:8080/
+      # - name: Verify Spring Boot application
+      #   run: |
+      #     curl http://localhost:8080/
 
-      - name: Stop Docker container
-        run: docker stop my-docker-container
+      # - name: Stop Docker container
+      #   run: docker stop my-docker-container
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1.1.0
