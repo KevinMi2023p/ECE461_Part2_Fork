@@ -24,11 +24,14 @@ public class PackagesQueryService {
     private final String COLLECTION_NAME = "Packages";
     private final String NameField = "metadata.Name";
     private final String VersionField = "metadata.Version";
+    private final String types[] = {"Exact", "Bounded range", "Carat", "Tilde"};
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
 
+
+    // Check type of query based on swagger
+    // We'll check if it's valid and how it affects the query
     private int type_of_query(String version_query) {
-        String types[] = {"Exact", "Bounded range", "Carat", "Tilde"};
-        for (int i = 0; i < types.length; i++) {
+        for (int i = 0; i < this.types.length; i++) {
             Pattern pattern = Pattern.compile(types[i]);
             Matcher match = pattern.matcher(version_query);
             if (match.find()) {
@@ -65,11 +68,20 @@ public class PackagesQueryService {
             if (type_of_query == -1) {
                 return null; // invalid request
             }
-            
+
             List<String> nums_found = this.get_nums_from_string(version_query);
 
+            // Single number section
             if (nums_found.size() == 1) {
-                query = query.whereEqualTo(VersionField, nums_found.get(0));
+                String comparison = "";
+                if (type_of_query == 2){
+                    comparison += "^";
+                } else if (type_of_query == 3) {
+                    comparison += "~";
+                }
+                comparison += nums_found.get(0);
+                query = query.whereEqualTo(VersionField, comparison);
+            // Double number section
             } else if (nums_found.size() == 2) {
                 query = query.whereEqualTo(VersionField, nums_found.get(0) + "-" + nums_found.get(1));
             } else {
