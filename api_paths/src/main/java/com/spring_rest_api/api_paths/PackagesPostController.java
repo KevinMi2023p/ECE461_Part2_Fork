@@ -66,9 +66,10 @@ public class PackagesPostController {
         if (packagesQueryService.checkValidQuery(pagQuerys) == false)
             return badRequestError;
 
-        List<Map<String,Object>> result = packagesQueryService.pagnitatedqueries(pagQuerys);
+        int limit_number_of_packages = 20;
+        List<Map<String,Object>> result = packagesQueryService.pagnitatedqueries(pagQuerys, limit_number_of_packages);
         if (result == null) 
-            return badRequestError;
+            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("Too many packages returned.");
         return ResponseEntity.ok(new Gson().toJson(result));
     }
 
