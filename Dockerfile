@@ -6,7 +6,7 @@ COPY . /app
 # COPY ./cli/libpackageanalyze.so /usr/lib/libpackageanalyze.so
 # COPY ./libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
-RUN javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
+
 
 RUN mvn -f /app/api_paths/pom.xml clean package
 
@@ -15,6 +15,7 @@ FROM ubuntu:20.04
 
 # Define the API_KEY build-time substitution variable
 ARG API_KEY
+ARG ACCOUNT_KEY
 
 # Set the API_KEY environment variable
 ENV API_KEY=${API_KEY}
@@ -55,17 +56,22 @@ RUN cd cli && \
     cp libpackageanalyze.* /usr/lib && \
     cd .. 
 
-RUN ls /usr/lib
+RUN javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
 
 RUN g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /usr/lib/libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
 
 # Copy the jar to the production image from the build stage.
 COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
-COPY --from=build /app/accountKey.json /app/accountKey.json
+# COPY --from=build /app/accountKey.json /app/accountKey.json
+RUN echo $API_KEY | tee api_paths/src/main/resources/githubToken.txt
+RUN sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
+RUN echo ${ACCOUNT_KEY} | base64 --decode > ./accountKey.json
 # COPY --from=build /usr/lib/libpackageanalyze.so /usr/lib/libpackageanalyze.so
 # COPY --from=build /usr/lib/libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=./accountKey.json
+
+
 # ENV LD_LIBRARY_PATH=/usr/lib
 
 RUN ls /usr/lib && echo "Contents of /usr/lib listed above."
@@ -74,5 +80,4 @@ RUN ls /usr/lib/libpackageanalyze.so && ls /usr/lib/libNetScoreUtil.so || echo "
 # ENV JAVA_TOOL_OPTIONS -Djava.library.path=/usr/lib
 
 # Run the web service on container startup.
-CMD ["java", "-Djava.security.egd=file:/dev/./urandom",  "-jar", "/app/app.jar"]
-
+CMD ["bash","docker.bash"]
