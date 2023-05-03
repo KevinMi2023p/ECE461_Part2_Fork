@@ -42,6 +42,7 @@ public class ResetController {
             String successMsg = "Registry is reset.";
             return ResponseEntity.ok(successMsg);
         } catch (Exception e) {
+            System.err.println("Something failed in reset");
             return badRequestError;
         }
     }
