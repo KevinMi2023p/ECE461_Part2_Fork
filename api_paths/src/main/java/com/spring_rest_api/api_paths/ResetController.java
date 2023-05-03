@@ -27,19 +27,23 @@ public class ResetController {
 
 
     @DeleteMapping(value = "/reset")
-    public ResponseEntity<String> reset(@RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
-        if(validateToken(token) == false) 
-            return badRequestError;
+    public ResponseEntity<String> reset(@RequestHeader("X-Authorization") String token) {
+        try {
+            if(validateToken(token) == false) 
+                return badRequestError;
 
-        if (resetService.checkAdminToken(token) == false)
-            return unAuthError;
-        
-        boolean result = resetService.clearCollection();
-        if (result == false)
-            return badRequestError;
+            if (resetService.checkAdminToken(token) == false)
+                return unAuthError;
+            
+            boolean result = resetService.clearCollection();
+            if (result == false)
+                return badRequestError;
 
-        String successMsg = "Registry is reset.";
-        return ResponseEntity.ok(successMsg);
+            String successMsg = "Registry is reset.";
+            return ResponseEntity.ok(successMsg);
+        } catch (Exception e) {
+            return badRequestError;
+        }
     }
 
     private boolean validateToken(String token) {
