@@ -78,4 +78,4 @@ RUN ls /usr/lib/libpackageanalyze.so && ls /usr/lib/libNetScoreUtil.so || echo "
 # ENV JAVA_TOOL_OPTIONS -Djava.library.path=/usr/lib
 
 # Run the web service on container startup.
-CMD ["cat accountKey.json && cat api_paths/src/main/resources/githubToken.txt && bash docker.bash"]
+CMD ["bash","docker.bash"]
