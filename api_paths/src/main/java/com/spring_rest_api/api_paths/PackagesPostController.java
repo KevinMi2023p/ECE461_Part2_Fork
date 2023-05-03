@@ -111,6 +111,12 @@ public class PackagesPostController {
         logger.debug("URL value: {}",encode.URL);
         //packageService.savePackage(product);
 
+        // Neither Content and URL are set
+        if (encode.getContent() == null && encode.getURL() == null) {
+            System.out.println("encode URL " + encode.URL + " encode content " + encode.Content + "encode jsprogram" + encode.JSProgram);
+            return badRequestError;
+        }
+
         // Content and URL are both set
         if (encode.getContent() != null && encode.getURL() != null) {
             System.out.println("encode URL " + encode.URL + " encode content " + encode.Content + "encode jsprogram" + encode.JSProgram);
