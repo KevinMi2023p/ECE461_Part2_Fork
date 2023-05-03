@@ -29,10 +29,10 @@ public class ResetController {
 
         // public ResponseEntity<String> reset(@RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
 
-    @DeleteMapping("/reset")
-    public ResponseEntity<String> reset() throws ExecutionException, InterruptedException {
-        // if(validateToken(token) == false) 
-        //     return unAuthError;
+    @DeleteMapping(value = "/reset")
+    public ResponseEntity<String> reset(@RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
+        if(validateToken(token) == false) 
+            return badRequestError;
 
         boolean result = resetService.clearCollection();
         if (result == false)
@@ -42,12 +42,12 @@ public class ResetController {
         return ResponseEntity.ok().body(successMsg);
     }
 
-    // private boolean validateToken(String token) {
-    //     try {
-    //         return authenticateService.validateJwtToken(token);
-    //     } catch (Exception e) {
-    //         return false;
-    //     }
-    // }
+    private boolean validateToken(String token) {
+        try {
+            return authenticateService.validateJwtToken(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 }
