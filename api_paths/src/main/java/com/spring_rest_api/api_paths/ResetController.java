@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.spring_rest_api.api_paths.service.ResetService;
 
 import com.spring_rest_api.api_paths.service.AuthenticateService;
-import com.spring_rest_api.api_paths.service.ResetService;
 
 @RestController
 public class ResetController {
@@ -27,19 +26,20 @@ public class ResetController {
     ResetService resetService;
 
 
-        // public ResponseEntity<String> reset(@RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
-
     @DeleteMapping(value = "/reset")
     public ResponseEntity<String> reset(@RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
         if(validateToken(token) == false) 
             return badRequestError;
 
+        if (resetService.checkAdminToken(token) == false)
+            return unAuthError;
+        
         boolean result = resetService.clearCollection();
         if (result == false)
             return badRequestError;
 
         String successMsg = "Registry is reset.";
-        return ResponseEntity.ok().body(successMsg);
+        return ResponseEntity.ok(successMsg);
     }
 
     private boolean validateToken(String token) {

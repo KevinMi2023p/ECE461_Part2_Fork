@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
@@ -18,16 +20,36 @@ import java.util.List;
 @DependsOn("firestoreInitialization")
 public class ResetService {
     // private final String COLLECTION_NAME = "Packages";
-    private CollectionReference packageCollectionReference = FirestoreClient.getFirestore().collection("Packages");
-    private CollectionReference tokenUseageCollectionReference = FirestoreClient.getFirestore().collection("TokenUsage");
-    private CollectionReference usersCollectionReference = FirestoreClient.getFirestore().collection("Users");
+    private final CollectionReference packageCollectionReference = FirestoreClient.getFirestore().collection("Packages");
+    private final CollectionReference tokenUseageCollectionReference = FirestoreClient.getFirestore().collection("TokenUsage");
+    private final CollectionReference usersCollectionReference = FirestoreClient.getFirestore().collection("Users");
     private int batchSize = 1000;
 
 
-    public boolean checkAdminToken() throws ExecutionException, InterruptedException {
+    public boolean checkAdminToken(String token) throws ExecutionException, InterruptedException {
+        Query query = tokenUseageCollectionReference.whereEqualTo("hashedToken", token);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
 
+        if (documents.size() != 1)
+            return false; 
 
-        return true;
+        String userNameAssoc = (String) documents.get(0).getData().get("username");
+        if (userNameAssoc == null)
+            return false;
+        
+        // System.out.println(userNameAssoc);
+        ApiFuture<DocumentSnapshot> future = usersCollectionReference.document(userNameAssoc).get();
+        DocumentSnapshot document = future.get();
+        if (!document.exists())
+            return false;
+        
+        Boolean adminFlag = (Boolean) document.getData().get("admin");
+        // System.out.println(adminFlag);
+        if (adminFlag == null)
+            return false;
+
+        return adminFlag;
     }
 
 
