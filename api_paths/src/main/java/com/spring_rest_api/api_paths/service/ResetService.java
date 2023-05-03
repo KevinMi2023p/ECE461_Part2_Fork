@@ -17,9 +17,18 @@ import java.util.List;
 
 @DependsOn("firestoreInitialization")
 public class ResetService {
-    private final String COLLECTION_NAME = "Packages";
-    private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
+    // private final String COLLECTION_NAME = "Packages";
+    private CollectionReference packageCollectionReference = FirestoreClient.getFirestore().collection("Packages");
+    private CollectionReference tokenUseageCollectionReference = FirestoreClient.getFirestore().collection("TokenUsage");
+    private CollectionReference usersCollectionReference = FirestoreClient.getFirestore().collection("Users");
     private int batchSize = 1000;
+
+
+    public boolean checkAdminToken() throws ExecutionException, InterruptedException {
+
+
+        return true;
+    }
 
 
     /**
@@ -30,7 +39,7 @@ public class ResetService {
         boolean result = true;
         // int numberOfPackages = collectionReference.get().
         try {
-            ApiFuture<QuerySnapshot> future = collectionReference.limit(this.batchSize).get();
+            ApiFuture<QuerySnapshot> future = packageCollectionReference.limit(this.batchSize).get();
             int deleted = 0;
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
             for (QueryDocumentSnapshot document : documents) {
