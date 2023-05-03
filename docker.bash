@@ -12,7 +12,9 @@ javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
 
 g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /usr/lib/libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
 
+export GOOGLE_APPLICATION_CREDENTIALS=accountKey.json
+NAME=$GOOGLE_APPLICATION_CREDENTIALS printenv NAME
 
-cat accountKey.json && 
-cat api_paths/src/main/resources/githubToken.txt &&
+ls 
+ls api_paths/src/main/resources/githubToken.txt &&
 java -Djava.security.egd=file:/dev/./urandom -jar /app/app.jar

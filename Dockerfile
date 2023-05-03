@@ -65,11 +65,11 @@ COPY --from=build /app/api_paths/target/ece461-part2.jar /app/app.jar
 # COPY --from=build /app/accountKey.json /app/accountKey.json
 RUN echo $API_KEY | tee api_paths/src/main/resources/githubToken.txt
 RUN sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
-RUN echo "${ACCOUNT_KEY}" | base64 --decode > /app/accountKey.json
+RUN echo "${ACCOUNT_KEY}" | base64 --decode > accountKey.json
 # COPY --from=build /usr/lib/libpackageanalyze.so /usr/lib/libpackageanalyze.so
 # COPY --from=build /usr/lib/libNetScoreUtil.so /usr/lib/libNetScoreUtil.so
 
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=accountKey.json
 # ENV LD_LIBRARY_PATH=/usr/lib
 
 RUN ls /usr/lib && echo "Contents of /usr/lib listed above."
