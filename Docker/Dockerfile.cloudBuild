@@ -67,7 +67,5 @@ ENV GOOGLE_CLOUD_PROJECT="teamfirestorm-61564"
 RUN ls /usr/lib && echo "Contents of /usr/lib listed above."
 RUN ls /usr/lib/libpackageanalyze.so && ls /usr/lib/libNetScoreUtil.so || echo "Required files not found in /usr/lib directory"
 
-EXPOSE 8080
-
 # Run the web service on container startup
 CMD ["/bin/bash", "-c", "cat accountKey.json && cat api_paths/src/main/resources/githubToken.txt && echo 'API_KEY'=${API_KEY} && echo 'ACCOUNT_KEY'=${ACCOUNT_KEY} && java -Djava.security.egd=file:/dev/./urandom -jar /app/app.jar"]

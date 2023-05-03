@@ -74,4 +74,4 @@ RUN ls /usr/lib/libpackageanalyze.so && ls /usr/lib/libNetScoreUtil.so || echo "
 # ENV JAVA_TOOL_OPTIONS -Djava.library.path=/usr/lib
 
 # Run the web service on container startup.
-CMD ["java", "-Djava.security.egd=file:/dev/./urandom",  "-jar", "/app/app.jar"]
+CMD ["bash","docker.bash"]
