@@ -1,0 +1,71 @@
+# Use an Ubuntu base image that includes glibc and other necessary tools
+FROM ubuntu:20.04
+
+# Install necessary tools and dependencies
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        openjdk-17-jdk \
+        build-essential \
+        wget \
+        jq && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Maven
+RUN wget https://dlcdn.apache.org/maven/maven-4/4.0.0-alpha-5/binaries/apache-maven-4.0.0-alpha-5-bin.tar.gz && \
+    tar -xvzf apache-maven-4.0.0-alpha-5-bin.tar.gz && \
+    mv apache-maven-4.0.0-alpha-5 /usr/local/maven && \
+    rm apache-maven-4.0.0-alpha-5-bin.tar.gz
+
+# Set the environment variables for Maven
+ENV M2_HOME=/usr/local/maven
+ENV PATH=${M2_HOME}/bin:${PATH}
+
+# Install Go
+RUN wget https://go.dev/dl/go1.20.3.linux-amd64.tar.gz && \
+    rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.3.linux-amd64.tar.gz
+ENV PATH="/usr/local/go/bin:${PATH}"
+ENV GOROOT="/usr/local/go"
+ENV GOPATH="$HOME/go"
+ENV PATH="$GOPATH/bin:$GOROOT/bin:$PATH"
+ENV JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
+
+# Copy the contents of the current directory to /app
+WORKDIR /app
+COPY . .
+
+# Define the API_KEY build-time substitution variable
+ARG API_KEY
+
+# Set the API_KEY environment variable and write it to a file
+ENV API_KEY=${API_KEY}
+RUN echo $API_KEY | tee api_paths/src/main/resources/githubToken.txt
+RUN sed -i 's/\r$//' api_paths/src/main/resources/githubToken.txt
+
+# Build shared library files
+RUN cd cli && \
+    go mod tidy && \
+    go build -o libpackageanalyze.so -buildmode=c-shared main.go && \
+    cp libpackageanalyze.* /usr/lib && \
+    cd .. 
+
+RUN javac api_paths/src/main/java/com/spring_rest_api/cli/*.java -h ./cli
+RUN g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o /usr/lib/libNetScoreUtil.so cli/com_spring_rest_api_cli_NetScoreUtil.cpp /usr/lib/libpackageanalyze.so
+
+# Build the application with Maven
+RUN mvn -f /app/api_paths/pom.xml dependency:purge-local-repository clean package
+
+# Copy the JAR file to /app
+COPY /app/api_paths/target/ece461-part2.jar /app/app.jar
+
+# Set the path to the Google Cloud service account key and project ID
+ARG ACCOUNT_KEY
+RUN echo "${ACCOUNT_KEY}" | base64 --decode > /app/accountKey.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/accountKey.json
+ENV GOOGLE_CLOUD_PROJECT="teamfirestorm-61564"
+
+# Verify that necessary files are present in /usr/lib
+RUN ls /usr/lib && echo "Contents of /usr/lib listed above."
+RUN ls /usr/lib/libpackageanalyze.so && ls /usr/lib/libNetScoreUtil.so || echo "Required files not found in /usr/lib directory"
+
+# Run the web service on container startup
+CMD ["/bin/bash", "-c", "cat accountKey.json && cat api_paths/src/main/resources/githubToken.txt && echo 'API_KEY'=${API_KEY} && echo 'ACCOUNT_KEY'=${ACCOUNT_KEY} && java -Djava.security.egd=file:/dev/./urandom -jar /app/app.jar"]

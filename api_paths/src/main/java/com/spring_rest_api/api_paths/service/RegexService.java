@@ -20,7 +20,6 @@ import com.google.gson.Gson;
 import com.spring_rest_api.api_paths.entity.RegexSchema;
 
 @Service
-
 @DependsOn("firestoreInitialization")
 public class RegexService {
     
@@ -28,6 +27,7 @@ public class RegexService {
     // private final String fieldToCheck = "metadata.Name";
     
     @NonNull
+    
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
 
 
