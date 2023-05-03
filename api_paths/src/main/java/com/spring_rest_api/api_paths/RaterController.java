@@ -56,6 +56,7 @@ public class RaterController {
         }
         
         String packageUrl = (String) packageData.get("URL");
+        this.logger.info(packageUrl);
 
         if (packageUrl == null) {
             String resultMessage = String.format("Package with id = \"%s\" did not have a URL", id);

@@ -28,3 +28,5 @@ build/
 
 ## KEYS ## 
 **/resources/firestore_credentials.json
+
+**/resources/githubToken.txt
