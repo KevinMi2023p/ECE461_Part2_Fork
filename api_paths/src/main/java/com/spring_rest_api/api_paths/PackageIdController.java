@@ -65,8 +65,12 @@ public class PackageIdController {
 
         // Couldn't find Cloud Firestore document to update existing data
         // Solution is to delete existing data then reupload new data
-        packageIdService.deletePackage(id);
-        packageService.savePackage(product);
+        try {
+            packageIdService.deletePackage(id);
+            packageIdService.recreatePackage(product);
+        } catch (ExecutionException | InterruptedException exception ) {
+            return notFoundError;
+        }
 
         String successMsg = "Version is updated.";
         return ResponseEntity.status(HttpStatus.OK).body(successMsg);
