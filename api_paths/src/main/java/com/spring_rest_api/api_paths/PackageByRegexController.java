@@ -31,7 +31,7 @@ public class PackageByRegexController {
     @PostMapping(value = "/package/byRegEx", produces = "application/json")
     public ResponseEntity<String> postMethodName(@RequestBody RegexSchema regexSchema,
             @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
-        if (!validateToken(token)) {
+        if (!authenticateService.validateAuthHeaderForUser(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     "There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
 
@@ -41,14 +41,6 @@ public class PackageByRegexController {
             return notFoundError;
 
         return ResponseEntity.ok().body(result);
-    }
-
-    private boolean validateToken(String token) {
-        try {
-            return authenticateService.validateJwtToken(token);
-        } catch (Exception e) {
-            return false;
-        }
     }
 
 }

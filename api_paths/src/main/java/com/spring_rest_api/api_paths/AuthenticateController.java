@@ -3,6 +3,7 @@ package com.spring_rest_api.api_paths;
 import com.spring_rest_api.api_paths.entity.AuthenticationRequest;
 import com.spring_rest_api.api_paths.entity.Secret;
 import com.spring_rest_api.api_paths.entity.User;
+import com.spring_rest_api.api_paths.entity.UserEntity;
 import com.spring_rest_api.api_paths.service.AuthenticateService;
 
 import org.slf4j.Logger;
@@ -19,15 +20,16 @@ import java.util.concurrent.ExecutionException;
 public class AuthenticateController {
 
     @Autowired
-    private AuthenticateService userService;
+    AuthenticateService userService;
+    
     private static final Logger logger = LoggerFactory.getLogger(AuthenticateService.class);
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AuthenticationRequest request) {
         try {
-            User registeredUser = userService.saveUser(request.getUser(), request.getSecret());
+            UserEntity registeredUser = userService.saveUser(request.getUser(), request.getSecret());
             if (registeredUser != null) {
-                return ResponseEntity.ok(registeredUser);
+                return ResponseEntity.ok(new User(registeredUser));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User registration failed.");
             }
@@ -37,15 +39,14 @@ public class AuthenticateController {
        
     }
 
-    @PutMapping(value = "/authenticate", produces = "application/json")
+    @PutMapping(value = "/authenticate", produces = "text/plain")
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request) {
         logger.info("User: {}", request.getUser());
-        logger.info("Secret: {}", request.getSecret());
         System.out.println("User " + request.getUser() + " Secret " + request.getSecret());
         String token;
         try {
             token = userService.authenticateUser(request.getUser(), request.getSecret());
-            System.out.println("Token Generated" + request.getSecret());
+            System.out.println("Token Generated " + token);
         } catch (ExecutionException | InterruptedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Authentication failed.");
         } catch (IllegalArgumentException e) {

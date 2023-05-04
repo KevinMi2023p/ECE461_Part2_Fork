@@ -1,46 +1,45 @@
 package com.spring_rest_api.api_paths.entity;
 
-import java.util.*;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.firebase.internal.NonNull;
 
 public class User {
     
     @JsonProperty("name")
-    private String name;
-    private boolean isAdmin;
-    private Map<String, String> userAuthenticationInfo;
+    @NonNull
+    public String name;
+    
+    public boolean isAdmin;
 
-    public User() {}
-
-    public Map<String, String> getUserAuthenticationInfo() {
-        return userAuthenticationInfo;
+    public User() {
+        this.name = "";
+        this.isAdmin = false;
     }
 
-    public void setUserAuthenticationInfo(Map<String, String> userAuthenticationInfo) {
-        this.userAuthenticationInfo = userAuthenticationInfo;
-    }
-
-    public User(String name, boolean isAdmin) {
+    public User(@NonNull String name, boolean isAdmin) {
         this.name = name;
-        this.isAdmin = isAdmin;
+        this.setIsAdmin(isAdmin);
     }
 
+    public User(UserEntity user) {
+        this.name = user.name;
+        this.isAdmin = user.admin;
+    }
+
+    @NonNull
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 
-    public boolean isAdmin() {
+    public boolean getIsAdmin() {
         return isAdmin;
     }
 
-    public void setIsAdmin(boolean admin) {
-        this.isAdmin = admin;
+    public void setIsAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
     }
-
-
 }

@@ -36,7 +36,7 @@ public class RaterController {
     
     @GetMapping(value="/package/{id}/rate", produces="application/json")
     public ResponseEntity<Object> PackageRate(@PathVariable String id ,  @RequestHeader("X-Authorization") String token) {
-        if (!validateToken(token)) {
+        if (!authenticateService.validateAuthHeaderForUser(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
 
         }
@@ -74,14 +74,5 @@ public class RaterController {
 
         return new ResponseEntity<Object>(nsm, null, HttpStatus.OK);
     }
-
-    private boolean validateToken(String token) {
-        try {
-            return authenticateService.validateJwtToken(token);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-    
 
 }
