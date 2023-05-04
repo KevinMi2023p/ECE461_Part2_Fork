@@ -43,7 +43,7 @@ public class PackageIdService {
     }
 
     // Returns null if the document can't be found
-    public Map<String, Object> getPackageData(String id) throws ExecutionException, InterruptedException{
+    public Map<String, Object> getPackageMap(String id) throws ExecutionException, InterruptedException{
         if (id == null) {
             return null;
         }
@@ -51,18 +51,8 @@ public class PackageIdService {
         DocumentReference docRef = collectionReference.document(id);
         ApiFuture<DocumentSnapshot> future = docRef.get();
         DocumentSnapshot document = future.get();
-
-        Map<String, Object> product = document.getData();
-        if (product == null) {
-            return null;
-        }
-
-        Object dataObject = product.get("data");
-
-        @SuppressWarnings("unchecked")
-        Map<String, Object> dataMap = (Map<String, Object>) dataObject;
         
-        return dataMap;
+        return document.getData();
     }
 
 

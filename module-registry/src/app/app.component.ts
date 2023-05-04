@@ -3,7 +3,7 @@ import { IAuthenticationRequest } from './schemas/IAuthenticationRequest';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { catchError, take } from 'rxjs';
 import { IAuthenticationToken } from './schemas/IAuthenticationToken';
-import { IPackageMetadata, MetadataToTr } from './schemas/IPackageMetadata';
+import { IPackageMetadata } from './schemas/IPackageMetadata';
 import { IPackageQuery } from './schemas/IPackageQuery';
 import { IEnumerateOffset } from './schemas/IEnumerateOffset';
 import { IPackagesPostResult } from './schemas/IPackagesPostResult';
@@ -14,6 +14,7 @@ import { IPackageHistoryEntry } from './schemas/IPackageHistoryEntry';
 import { IPackageName } from './schemas/IPackageName';
 import { IPackageRegEx } from './schemas/IPackageRegEx';
 import { environment } from 'src/environments/environment';
+import { saveAs } from 'file-saver';
 
 type HttpAnyResponse<T> = HttpResponse<T> | HttpErrorResponse;
 
@@ -37,9 +38,9 @@ export class AppComponent implements OnInit {
     public packageSearchButton: HTMLButtonElement;
     public regExSearchButton: HTMLButtonElement;
 
-    private packageQueries: IPackageQuery[] | null      = null;
+    private packageQueries: IPackageQuery[] | null     = null;
     public queryOffset: string | null                  = null;
-    private queryOffsetPrev: string | null                  = null;
+    private queryOffsetPrev: string | null             = null;
     public packagesResult: IPackagesPostResult | null  = null;
     public regExResult: IPackagesPostResult | null     = null;
 
@@ -190,9 +191,64 @@ export class AppComponent implements OnInit {
         this.tableNextButton = document.getElementById('tableNextButton') as HTMLButtonElement;
         this.tablePreviousButton = document.getElementById('tablePreviousButton') as HTMLButtonElement;
 
-        // this.tableNextButton.onclick = (event: MouseEvent) => {
-        //     this.
-        // };
+        this.tablePreviousButton.onclick = async (event: MouseEvent) => {
+            if (this.packagesResult && !this.regExResult) {
+                this.tablePreviousButton.disabled = true;
+                this.packageSearchButton.disabled = true;
+
+                let nextState: boolean = this.tableNextButton.disabled;
+                this.tableNextButton.disabled = true;
+
+                let result: IPackagesPostResult | null = await this.packagesPostRequest(this.packageQueries!, this.queryOffsetPrev);
+
+                if (result) {
+                    this.queryOffset = this.queryOffsetPrev;
+                    let pp: number = Number(this.queryOffsetPrev) - 1;
+                    if (pp > -1) {
+                        this.queryOffsetPrev = String(pp);
+                    } else {
+                        this.queryOffsetPrev = null;
+                    }
+                    this.packagesResult = result;
+                    this.regExResult = null;
+
+                    // display the packages
+                    await this.displayPackagesResult();
+                } else {
+                    this.tableNextButton.disabled = nextState;
+                    this.packageSearchButton.disabled = false;
+                }
+
+                this.packageSearchButton.disabled = false;
+            }
+        };
+
+        this.tableNextButton.onclick = async (event: MouseEvent) => {
+            if (this.packagesResult && !this.regExResult) {
+                this.tableNextButton.disabled = true;
+                this.packageSearchButton.disabled = true;
+
+                let prevState: boolean = this.tablePreviousButton.disabled;
+                this.tablePreviousButton.disabled = true;
+
+                let result: IPackagesPostResult | null = await this.packagesPostRequest(this.packageQueries!, this.packagesResult.offset);
+
+                if (result) {
+                    this.queryOffsetPrev = this.queryOffset;
+                    this.queryOffset = this.packagesResult.offset;
+                    this.packagesResult = result;
+                    this.regExResult = null;
+
+                    // display the packages
+                    await this.displayPackagesResult();
+                } else {
+                    this.tablePreviousButton.disabled = prevState;
+                    this.packageSearchButton.disabled = false;
+                }
+
+                this.packageSearchButton.disabled = false;
+            }
+        };
     }
 
     private static removeRowsFromTable(selection: HTMLTableSectionElement): void {
@@ -219,9 +275,148 @@ export class AppComponent implements OnInit {
         this.theader.appendChild(row);
     }
 
+    private MetadataToTr(metadata: IPackageMetadata): HTMLTableRowElement {
+        let row: HTMLTableRowElement = document.createElement('tr');
+
+        let th: HTMLTableCellElement = document.createElement('th');
+        if (metadata.Name) {
+            th.innerText = metadata.Name;
+        }
+        row.appendChild(th);
+
+        th = document.createElement('th');
+        if (metadata.Version) {
+            th.innerText = metadata.Version;
+        }
+        row.appendChild(th);
+
+        th = document.createElement('th');
+        if (metadata.ID) {
+            th.innerText = metadata.ID;
+        }
+        row.appendChild(th);
+
+        let pPackage: Promise<IPackage | null> | null = null;
+
+        th = document.createElement('th');
+        let button: HTMLButtonElement = document.createElement("button");
+        button.innerText = 'Download Content';
+        button.onclick = async (event: MouseEvent) => {
+            button.disabled = true;
+
+            if (pPackage == null) {
+                pPackage = this.packageIdGetRequest(metadata.ID!);
+            }
+
+            let pkg: IPackage | null = await pPackage;
+
+            if (pkg) {
+                if (pkg.data?.Content) {
+                    let bytechars = atob(pkg.data.Content);
+                    let bytenums = new Array(bytechars.length);
+                    for (let i = 0; i < bytechars.length; i++) {
+                        bytenums[i] = bytechars.charCodeAt(i);
+                    }
+                    let filename: string = pkg.metadata!.ID! + ".zip";
+                    saveAs(new File([(new Uint8Array(bytenums)).buffer], filename, { type: 'application/zip' }), filename);
+                    button.disabled = false;
+                }
+            } else {
+                pPackage = null;
+                button.disabled = false;
+            }
+
+        };
+        th.appendChild(button);
+        row.appendChild(th);
+
+        th = document.createElement('th');
+        button = document.createElement("button");
+        button.innerText = 'Download JS';
+        button.onclick = async (event: MouseEvent) => {
+            button.disabled = true;
+
+            if (pPackage == null) {
+                pPackage = this.packageIdGetRequest(metadata.ID!);
+            }
+
+            let pkg: IPackage | null = await pPackage;
+
+            if (pkg) {
+                if (pkg.data?.JSProgram) {
+                    let bytechars = pkg.data.JSProgram;
+                    let bytenums = new Array(bytechars.length);
+                    for (let i = 0; i < bytechars.length; i++) {
+                        bytenums[i] = bytechars.charCodeAt(i);
+                    }
+                    let filename: string = pkg.metadata!.ID! + ".js";
+                    saveAs(new File([(new Uint8Array(bytenums)).buffer], filename, { type: 'text/plain' }), filename);
+                    button.disabled = false;
+                }
+            } else {
+                pPackage = null;
+                button.disabled = false;
+            }
+        };
+        th.appendChild(button);
+        row.appendChild(th);
+
+        th = document.createElement('th');
+        button = document.createElement("button");
+        button.innerText = 'Open URL';
+        button.onclick = async (event: MouseEvent) => {
+            button.disabled = true;
+
+            if (pPackage == null) {
+                pPackage = this.packageIdGetRequest(metadata.ID!);
+            }
+
+            let pkg: IPackage | null = await pPackage;
+
+            if (pkg) {
+                if (pkg.data?.URL) {
+                    window.open(pkg.data.URL, '_blank');
+                    button.disabled = false;
+                }
+            } else {
+                pPackage = null;
+                button.disabled = false;
+            }
+        };
+        th.appendChild(button);
+        row.appendChild(th);
+
+        th = document.createElement('th');
+        button = document.createElement("button");
+        button.innerText = 'Delete Package';
+        button.onclick = async (event: MouseEvent) => {
+            button.disabled = true;
+
+            await this.packageIdDeleteRequest(metadata.ID!);
+
+            if (this.packagesResult && !this.regExResult) {
+                let result = await this.packagesPostRequest(this.packageQueries!, this.queryOffset);
+                if (result && result.metadatas.length == 0 && this.tablePreviousButton.disabled == false) {
+                    this.tablePreviousButton.click();
+                } else if (result) {
+                    this.packagesResult = result
+
+                    // display the packages
+                    await this.displayPackagesResult();
+                }
+            }
+
+            button.disabled = false;
+        };
+        th.appendChild(button);
+        row.appendChild(th);
+
+        return row;
+    }
+
     private displayMetadata(metadata: IPackageMetadata[]): void {
         AppComponent.removeRowsFromTable(this.tbody);
-        metadata.forEach((m) => this.tbody.appendChild(MetadataToTr(m)));
+        metadata.forEach((m) => this.tbody.appendChild(this.MetadataToTr(m)));
     }
 
     private async displayPackagesResult(): Promise<void> {
@@ -237,7 +432,7 @@ export class AppComponent implements OnInit {
 
         await pHeaders;
 
-        this.tablePreviousButton.disabled = this.queryOffset == null;
+        this.tablePreviousButton.disabled = this.queryOffsetPrev == null;
         this.tableNextButton.disabled = this.packagesResult.offset == null;
     }
 
@@ -315,13 +510,11 @@ export class AppComponent implements OnInit {
 
             this.getAuth();
 
-            let result: IPackagesPostResult | null = await this.packagesPostRequest(tempPackageQueries, "0");
-
-            console.log(result)
+            let result: IPackagesPostResult | null = await this.packagesPostRequest(tempPackageQueries, null);
 
             if (result) {
                 this.packageQueries = tempPackageQueries;
-                this.queryOffset = null;
+                this.queryOffset = "0";
                 this.queryOffsetPrev = null;
                 this.packagesResult = result;
                 this.regExResult = null;
@@ -335,6 +528,8 @@ export class AppComponent implements OnInit {
 
             this.packageSearchButton.disabled = false;
         };
+
+        this.tablePreviousButton.onclick
     }
 
     // generic *Request methods
@@ -364,12 +559,15 @@ export class AppComponent implements OnInit {
     }
 
     private async getRequest<T>(url: string): Promise<T | null> {
+        console.log(`GET ${url}`);
+
         let res: HttpAnyResponse<T> = await new Promise<HttpAnyResponse<T>>(
             (resolve) => {
                 this.http.get<T>(url, {
                     observe: 'response',
                     withCredentials: false,
-                    headers: { "X-Authorization": this.authToken }
+                    headers: { "X-Authorization": this.authToken },
+                    responseType: 'json'
                 }).pipe(take(1), catchError((error: HttpErrorResponse) => {
                     resolve(error);
                     throw Error();
@@ -419,12 +617,7 @@ export class AppComponent implements OnInit {
         console.log(JSON.stringify(packageQueries))
 
         let res: HttpAnyResponse<IPackageMetadata[]> = await this.postRequest<IPackageQuery[], IPackageMetadata[]>(
-            '/packages', packageQueries, params, {
-                "X-Authorization": this.authToken,
-                "Content-Type": "application/json",
-                "accept": "*/*",
-                "Response-Type": "text"
-            });
+            '/packages', packageQueries, params, { "X-Authorization": this.authToken });
 
         let response: HttpResponse<IPackageMetadata[]> | null = res as HttpResponse<IPackageMetadata[]>;
 
@@ -448,7 +641,7 @@ export class AppComponent implements OnInit {
 
         id = encodeURIComponent(id);
 
-        return await this.getRequest<IPackage>(`/package/${id}`);
+        return this.getRequest<IPackage>(`/package/${id}`);
     }
 
     private async packageIdPutRequest(id: string, pkg: IPackage): Promise<boolean> {
@@ -527,11 +720,6 @@ export class AppComponent implements OnInit {
             (resolve) => {
                 this.http.put('/authenticate', authRequest, {
                     observe: 'response',
-                    headers: {
-                        "Content-Type": "application/json",
-                        "accept": "*/*",
-                        "Response-Type": "text"
-                    },
                     responseType: "text"
                 }).pipe(take(1), catchError((error: HttpErrorResponse) => {
                     resolve(error);

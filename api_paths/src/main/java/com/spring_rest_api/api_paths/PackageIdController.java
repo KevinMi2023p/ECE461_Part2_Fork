@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.Map;
 // import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
@@ -38,14 +39,14 @@ public class PackageIdController {
     AuthenticateService authenticateService;
 
     @GetMapping(value = "/package/{id}", produces = "application/json")
-    public ResponseEntity<String> packageId(@PathVariable String id ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
+    public ResponseEntity<?> packageId(@PathVariable String id ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
         if (!authenticateService.validateAuthHeaderForUser(token)) {
             logger.info("Token sent by User: {}", token);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
 
         }
-        String document_string = packageIdService.getPackage(id);
-        return (document_string == null) ? notFoundError : ResponseEntity.status(HttpStatus.OK).body(document_string);
+        Map<String, Object> pkg = packageIdService.getPackageMap(id);
+        return (pkg == null) ? notFoundError : ResponseEntity.status(HttpStatus.OK).body(pkg);
     }
 
     @PutMapping("/package/{id}")

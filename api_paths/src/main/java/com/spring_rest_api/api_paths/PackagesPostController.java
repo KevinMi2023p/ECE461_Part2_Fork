@@ -45,8 +45,13 @@ import java.util.concurrent.TimeoutException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Base64;
+
+
+import java.util.zip.GZIPOutputStream;
+
 import java.util.List;
 import java.util.Map;
+
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -161,6 +166,7 @@ public class PackagesPostController {
             String githubUrl = encode.getURL();
             String accessToken = readAccessTokenFromFile();
             logger.debug("Github Access Token: {}",accessToken);
+            //String accessToken = "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";
 
             URL url = new URL(githubUrl + "/archive/refs/heads/master.zip");
             URLConnection connection = url.openConnection();
@@ -171,6 +177,7 @@ public class PackagesPostController {
                 byte[] data = inputStream.readAllBytes();
                 String base64Encoded = Base64.getEncoder().encodeToString(data);
                 encode.setContent(base64Encoded);
+                //System.out.println("This is the size:" + base64Encoded.length());
 
             }
 
@@ -188,7 +195,7 @@ public class PackagesPostController {
                 ZipEntry entry;
                 //TarArchiveEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
-                    //System.out.println(entry.getName());
+//                    System.out.println(entry.getName());
                     String entry_name = entry.getName();
                     int valid_file = entry_name.length() - entry_name.replace("/","").length();
                     //if (!entry.isDirectory() && entry.getName().endsWith("package.json"))
