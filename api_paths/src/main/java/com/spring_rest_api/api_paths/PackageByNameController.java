@@ -28,7 +28,7 @@ public class PackageByNameController {
     
 	@GetMapping(value="/package/byName/{name}", produces = "application/json")
 	public ResponseEntity<String> packageByName(@PathVariable String name , @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
-        if (!validateToken(token)) {
+        if (!authenticateService.validateAuthHeaderForUser(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     "There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
 
@@ -40,7 +40,7 @@ public class PackageByNameController {
 
     @DeleteMapping(value = "/package/byName/{name}")
     public ResponseEntity<String> deleteMethodName(@PathVariable String name , @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
-        if (!validateToken(token)) {
+        if (!authenticateService.validateAuthHeaderForAdmin(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     "There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
 
@@ -51,14 +51,6 @@ public class PackageByNameController {
         
         String successMsg = "Package is deleted.";
         return ResponseEntity.ok().body(successMsg);
-    }
-
-    private boolean validateToken(String token) {
-        try {
-            return authenticateService.validateJwtToken(token);
-        } catch (Exception e) {
-            return false;
-        }
     }
 
 }

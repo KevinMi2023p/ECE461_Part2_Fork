@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.google.api.core.ApiFuture;
@@ -17,6 +19,8 @@ import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import com.spring_rest_api.api_paths.entity.PagQuery;
 
+// import ch.qos.logback.classic.Logger;
+
 // import ch.qos.logback.core.boolex.Matcher;
 
 @Service
@@ -26,10 +30,12 @@ public class PackagesQueryService {
     private final String VersionField = "metadata.Version";
     private final String types[] = {"Exact", "Bounded range", "Carat", "Tilde"};
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
+    
+    private final Logger logger = LoggerFactory.getLogger(PackagesQueryService.class);
 
     // Check if a String can be converted in int
     public int checkValidQueryVar(String input) {
-        int offset = 0;
+        int offset;
         try {
             offset = Integer.parseInt(input);
         } catch (NumberFormatException e) {
@@ -75,21 +81,24 @@ public class PackagesQueryService {
         return result;
     }
 
-    public List<Map<String, Object>> pagnitatedqueries(List<PagQuery> pagQuerys, int offset) throws ExecutionException, InterruptedException {
+    public ArrayList<Map<String, Object>> pagnitatedqueries(List<PagQuery> pagQuerys) throws ExecutionException, InterruptedException {
         // Note, there is no OR query for Java on Firestore
 
         // We add all the packages we find here
-        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+        ArrayList<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 
         // We're going to have to go through each different query, since they're seperate queries
         for(PagQuery pags : pagQuerys) {
             Query query = collectionReference.whereEqualTo(NameField, pags.get_Name());
+            
             String version_query = pags.get_Version();
 
             Integer type_of_query = this.type_of_query(version_query);
+            logger.info("query type: {}", type_of_query);
 
             // Return list of version numbers found, group is reference to regex group
             List<String> nums_found = this.get_nums_from_string(version_query);
+            logger.info("version strings: {}", nums_found);
 
             // Single number section
             if (nums_found.size() == 1) {
@@ -101,21 +110,24 @@ public class PackagesQueryService {
                 }
                 comparison += nums_found.get(0);
                 query = query.whereEqualTo(VersionField, comparison);
+                logger.info("version comparison: {}", comparison);
             // Double number section
             } else if (nums_found.size() == 2) {
                 query = query.whereEqualTo(VersionField, nums_found.get(0) + "-" + nums_found.get(1));
             } else {
                 // This condition will probably never hit unless the query is invalid
-                return null;
+                query = null;
             }
             
-            ApiFuture<QuerySnapshot> future = query.get();
-            for (DocumentSnapshot document : future.get().getDocuments()) {
-                Map<String,Object> metaData = (Map<String, Object>) document.getData().get("metadata");
-                result.add(metaData);
+            if (query != null) {
+                ApiFuture<QuerySnapshot> future = query.get();
+                for (DocumentSnapshot document : future.get().getDocuments()) {
+                    Map<String,Object> metaData = (Map<String, Object>) document.getData().get("metadata");
+                    result.add(metaData);
+                }
             }
         }
 
-        return (offset >= result.size()) ? null : result.subList(offset, result.size());
+        return result;
     }
 }
