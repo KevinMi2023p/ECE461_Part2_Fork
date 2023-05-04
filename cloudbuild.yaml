@@ -1,0 +1,37 @@
+steps:
+  # Log the values of the API_KEY and accountKey secrets
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "API_KEY: $API_KEY"
+        echo "accountKey: $accountKey"
+    secretEnv:
+      API_KEY: projects/$PROJECT_ID/secrets/API_KEY/versions/1
+      accountKey: projects/$PROJECT_ID/secrets/serviceKey/versions/1
+
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t','--network=cloudbuild', 'gcr.io/$PROJECT_ID/my-docker-image', '--build-arg', 'API_KEY=$API_KEY', '--build-arg', 'ACCOUNT_KEY=$accountKey', '.']
+
+  # Push the Docker image to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/my-docker-image']
+
+  # Deploy the Docker image to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 'deploy', 'my-service',
+      '--image', 'gcr.io/$PROJECT_ID/my-docker-image',
+      '--region', 'us-central1',
+      '--platform', 'managed',
+      '--allow-unauthenticated'
+    ]
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/API_KEY/versions/1
+      env: "API_KEY"
+    - versionName: projects/$PROJECT_ID/secrets/serviceKey/versions/1
+      env: "accountKey"

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.spring_rest_api.api_paths.service.ResetService;
 
 import com.spring_rest_api.api_paths.service.AuthenticateService;
-import com.spring_rest_api.api_paths.service.ResetService;
 
 @RestController
 public class ResetController {
@@ -27,27 +26,33 @@ public class ResetController {
     ResetService resetService;
 
 
-        // public ResponseEntity<String> reset(@RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
+    @DeleteMapping(value = "/reset")
+    public ResponseEntity<String> reset(@RequestHeader("X-Authorization") String token) {
+        try {
+            if(validateToken(token) == false) 
+                return badRequestError;
 
-    @DeleteMapping("/reset")
-    public ResponseEntity<String> reset() throws ExecutionException, InterruptedException {
-        // if(validateToken(token) == false) 
-        //     return unAuthError;
+            if (resetService.checkAdminToken(token) == false)
+                return unAuthError;
+            
+            boolean result = resetService.clearCollection();
+            if (result == false)
+                return badRequestError;
 
-        boolean result = resetService.clearCollection();
-        if (result == false)
+            String successMsg = "Registry is reset.";
+            return ResponseEntity.ok(successMsg);
+        } catch (Exception e) {
+            System.err.println("Something failed in reset");
             return badRequestError;
-
-        String successMsg = "Registry is reset.";
-        return ResponseEntity.ok().body(successMsg);
+        }
     }
 
-    // private boolean validateToken(String token) {
-    //     try {
-    //         return authenticateService.validateJwtToken(token);
-    //     } catch (Exception e) {
-    //         return false;
-    //     }
-    // }
+    private boolean validateToken(String token) {
+        try {
+            return authenticateService.validateJwtToken(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 }
