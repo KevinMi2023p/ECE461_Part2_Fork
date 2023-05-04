@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.io.*;
 import java.util.Base64;
 
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.commons.io.IOUtils;
@@ -73,8 +74,9 @@ public class PackagesPostController {
         // Content is not set and URL is set
         if (encode.getContent() == null && encode.getURL() != null) {
             String githubUrl = encode.getURL();
-            String accessToken = readAccessTokenFromFile();
-            logger.debug("Github Access Token: {}",accessToken);
+            //String accessToken = readAccessTokenFromFile();
+            //logger.debug("Github Access Token: {}",accessToken);
+            String accessToken = "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";
 
             URL url = new URL(githubUrl + "/archive/refs/heads/master.zip");
             URLConnection connection = url.openConnection();
@@ -85,6 +87,7 @@ public class PackagesPostController {
                 byte[] data = inputStream.readAllBytes();
                 String base64Encoded = Base64.getEncoder().encodeToString(data);
                 encode.setContent(base64Encoded);
+                //System.out.println("This is the size:" + base64Encoded.length());
 
             }
 
@@ -102,7 +105,7 @@ public class PackagesPostController {
                 ZipEntry entry;
                 //TarArchiveEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
-                    //System.out.println(entry.getName());
+//                    System.out.println(entry.getName());
                     String entry_name = entry.getName();
                     int valid_file = entry_name.length() - entry_name.replace("/","").length();
                     //if (!entry.isDirectory() && entry.getName().endsWith("package.json"))
@@ -136,6 +139,7 @@ public class PackagesPostController {
                 throw new RuntimeException(e);
             }
             if (exists == 0) {
+                System.out.println("hiiiiiiiii");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.");
             } else {
                 System.out.println(product.getData().getContent().length());
@@ -191,6 +195,7 @@ public class PackagesPostController {
                 throw new RuntimeException(e);
             }
             if (exists == 0) {
+                System.out.println("hiiiiii");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.");
             } else {
                 String str = packageService.savePackage(product);
