@@ -32,13 +32,15 @@ public class ResetController {
             if(!authenticateService.validateAuthHeaderForAdmin(token)) 
                 return badRequestError;
 
-            if (resetService.checkAdminToken(token) == false)
-                return unAuthError;
+            // if (resetService.checkAdminToken(token) == false)
+            //     return unAuthError;
             
             boolean result = resetService.clearCollection();
-            if (result == false)
+            boolean result1 = resetService.clearTokenUsageCollection();
+            boolean result2 = resetService.clearUsersCollection();
+            if ((result | result1 | result2) == false)
                 return badRequestError;
-
+            authenticateService.createDefaultUser();
             String successMsg = "Registry is reset.";
             return ResponseEntity.ok(successMsg);
         } catch (Exception e) {
