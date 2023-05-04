@@ -39,7 +39,7 @@ public class PackageIdController {
 
     @GetMapping(value = "/package/{id}", produces = "application/json")
     public ResponseEntity<String> packageId(@PathVariable String id ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
-        if (!validateToken(token)) {
+        if (!authenticateService.validateAuthHeaderForUser(token)) {
             logger.info("Token sent by User: {}", token);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
 
@@ -50,7 +50,7 @@ public class PackageIdController {
 
     @PutMapping("/package/{id}")
     public ResponseEntity<String> putMethodName(@PathVariable String id, @RequestBody Product product ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
-        if (!validateToken(token)) {
+        if (!authenticateService.validateAuthHeaderForUser(token)) {
             logger.info("Token sent by User: {}", token);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
 
@@ -78,22 +78,13 @@ public class PackageIdController {
 
     @DeleteMapping("/package/{id}")
     public ResponseEntity<String> deleteMethodName(@PathVariable String id ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException {
-        if (!validateToken(token)) {
+        if (!authenticateService.validateAuthHeaderForUser(token)) {
             logger.info("Token sent by User: {}", token);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.");
-
         }
         boolean deletedDoc = packageIdService.deletePackage(id);
         String delMsg = "Package is deleted.";
         return (deletedDoc == false) ? notFoundError : ResponseEntity.status(HttpStatus.OK).body(delMsg);
-    }
-
-    private boolean validateToken(String token) {
-        try {
-            return authenticateService.validateJwtToken(token);
-        } catch (Exception e) {
-            return false;
-        }
     }
 
 }

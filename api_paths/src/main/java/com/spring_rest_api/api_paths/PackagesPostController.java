@@ -1,6 +1,7 @@
 package com.spring_rest_api.api_paths;
 
 import com.google.api.gax.rpc.InternalException;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.gson.Gson;
 import com.spring_rest_api.api_paths.entity.Data;
 import com.spring_rest_api.api_paths.entity.Metadata;
@@ -17,8 +18,11 @@ import com.spring_rest_api.api_paths.service.PackagesQueryService;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -39,6 +43,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Base64;
 
 
@@ -76,39 +81,68 @@ public class PackagesPostController {
     }
     
     @PostMapping(value = "/packages", produces = "application/json")
-    public ResponseEntity<String> packages_plurual(@RequestBody List<PagQuery> pagQuerys, @RequestHeader("X-Authorization") String token, @RequestParam("offset") String offsetVar) throws ExecutionException, InterruptedException {
-        if (!validateToken(token))
-            return badRequestError;
-
-        int offset = packagesQueryService.checkValidQueryVar(offsetVar);
-        if (offset < 0)
-            return badRequestError;
+    public ResponseEntity<?> packages_plurual(@RequestBody List<PagQuery> pagQuerys, @RequestHeader("X-Authorization") String token, @RequestParam(name = "offset", required = false) String offsetVar) throws ExecutionException, InterruptedException {
+        int offsetSize = 5;
         
-        if (packagesQueryService.checkValidQuery(pagQuerys) == false)
+        if (!authenticateService.validateAuthHeaderForUser(token)) {
+            logger.info("Bad token.");
             return badRequestError;
+        }
+        int offset;
+        if (offsetVar != null) {
+            offset = packagesQueryService.checkValidQueryVar(offsetVar);
+        } else {
+            offset = 0;
+        }
 
+        if (offset < 0) {
+            logger.info("Negative offset: {}", offset);
+            return badRequestError;
+        }
+
+        if (!packagesQueryService.checkValidQuery(pagQuerys)) {
+            logger.info("Bad queries.");
+            return badRequestError;
+        }
         // Above sections check if the parameters for the function are correct
 
 
         // Section below will run the queries, if it takes longer than 5 seconds it times out
         ExecutorService executor = Executors.newCachedThreadPool();
-        Callable<List<Map<String,Object>>> task = new Callable<List<Map<String,Object>>>() {
-            public List<Map<String,Object>> call() throws ExecutionException, InterruptedException {
-                return packagesQueryService.pagnitatedqueries(pagQuerys, offset);
+        Callable<ArrayList<Map<String,Object>>> task = new Callable<ArrayList<Map<String,Object>>>() {
+            public ArrayList<Map<String,Object>> call() throws ExecutionException, InterruptedException {
+                return packagesQueryService.pagnitatedqueries(pagQuerys);
             }
         };
-        Future<List<Map<String,Object>>> future = executor.submit(task);
+        Future<ArrayList<Map<String,Object>>> future = executor.submit(task);
+        ArrayList<Map<String,Object>> result;
         try {
-            List<Map<String,Object>> result = future.get(5, TimeUnit.SECONDS);
-            return (result == null) ? badRequestError : ResponseEntity.ok(new Gson().toJson(result));
+            result = future.get(5, TimeUnit.SECONDS);
         } catch (TimeoutException ex) {
             return tooLargeError;
+        }
+
+        logger.info("Result size: ", result.size());
+
+        if (offset >= result.size()) {
+            result = new ArrayList<Map<String, Object>>();
+        } else {
+            result = new ArrayList<Map<String, Object>>(result.subList(offsetSize * offset, result.size()));
+        }
+        
+        if (result.size() > offsetSize) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("offset", String.format("{}", offset + 1));
+            result = new ArrayList<Map<String, Object>>(result.subList(0, offsetSize));
+            return new ResponseEntity<ArrayList<Map<String, Object>>>(result, headers, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<ArrayList<Map<String, Object>>>(result, HttpStatus.OK);
         }
     }
 
     @PostMapping(value = "/package", produces = "application/json")
     public ResponseEntity<String> package_single(@RequestBody encodedProduct encode ,  @RequestHeader("X-Authorization") String token) throws ExecutionException, InterruptedException , MalformedURLException, IOException {
-        if (!validateToken(token)) {
+        if (!authenticateService.validateAuthHeaderForUser(token)) {
             return badRequestError;
         }
         System.out.println("encode URL " + encode.URL + " encode content " + encode.Content + "encode jsprogram" + encode.JSProgram);
@@ -263,13 +297,7 @@ public class PackagesPostController {
         return null;
     }
 
-    private boolean validateToken(String token) {
-        try {
-            return authenticateService.validateJwtToken(token);
-        } catch (Exception e) {
-            return false;
-        }
-    }
+
 
     private static String readAccessTokenFromFile() throws IOException {
         ClassPathResource resource = new ClassPathResource("githubToken.txt");
