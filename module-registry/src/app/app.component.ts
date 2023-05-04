@@ -14,6 +14,7 @@ import { IPackageHistoryEntry } from './schemas/IPackageHistoryEntry';
 import { IPackageName } from './schemas/IPackageName';
 import { IPackageRegEx } from './schemas/IPackageRegEx';
 import { environment } from 'src/environments/environment';
+import { saveAs } from 'file-saver';
 
 type HttpAnyResponse<T> = HttpResponse<T> | HttpErrorResponse;
 
@@ -255,7 +256,16 @@ export class AppComponent implements OnInit {
             let pkg: IPackage | null = await pPackage;
 
             if (pkg) {
-
+                if (pkg.data?.Content) {
+                    let bytechars = atob(pkg.data.Content);
+                    let bytenums = new Array(bytechars.length);
+                    for (let i = 0; i < bytechars.length; i++) {
+                        bytenums[i] = bytechars.charCodeAt(i);
+                    }
+                    let filename: string = pkg.metadata!.Version! + ".zip";
+                    let f: File = new File([new Uint8Array(bytenums)], filename, { type: 'application/zip' });
+                    saveAs();
+                }
             }
 
             button.disabled = false;
