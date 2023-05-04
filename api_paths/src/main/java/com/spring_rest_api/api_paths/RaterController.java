@@ -44,7 +44,10 @@ public class RaterController {
         Map<String, Object> packageData = null;
 
         try {
-            packageData = packageIdService.getPackageData(id);
+            packageData = packageIdService.getPackageMap(id);
+            if (packageData != null) {
+                packageData = (Map<String, Object>) packageIdService.getPackageMap(id).get("data");
+            }
         } catch (Exception e) {
             this.logger.info(e.getMessage());
         }
