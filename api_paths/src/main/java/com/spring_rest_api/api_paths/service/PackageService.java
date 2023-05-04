@@ -16,7 +16,6 @@ import java.util.concurrent.ExecutionException;
 
 
 @Service
-
 @DependsOn("firestoreInitialization")
 public class PackageService extends DbCollectionService {
     @NonNull

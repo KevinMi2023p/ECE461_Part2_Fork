@@ -26,6 +26,12 @@ public class PackageIdService {
     private CollectionReference collectionReference = FirestoreClient.getFirestore().collection(COLLECTION_NAME);
     private Gson gson = new Gson();     // using .toString doesn't keep the quotes on the JSON
 
+    // Recreates the packages that was deleted to have upload feature
+    public void recreatePackage(Product product) throws ExecutionException, InterruptedException {
+        collectionReference.document(product.getMetadata().getID()).set(product);
+        // if (future.get().getUpdateTime())
+    }
+
     // Returns a String representation of the document found in Packages
     // Returns null if the document can't be found
     public String getPackage(@Nonnull String id) throws ExecutionException, InterruptedException{
