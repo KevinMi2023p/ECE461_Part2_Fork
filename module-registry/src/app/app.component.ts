@@ -3,7 +3,7 @@ import { IAuthenticationRequest } from './schemas/IAuthenticationRequest';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { catchError, take } from 'rxjs';
 import { IAuthenticationToken } from './schemas/IAuthenticationToken';
-import { IPackageMetadata, MetadataToTr } from './schemas/IPackageMetadata';
+import { IPackageMetadata } from './schemas/IPackageMetadata';
 import { IPackageQuery } from './schemas/IPackageQuery';
 import { IEnumerateOffset } from './schemas/IEnumerateOffset';
 import { IPackagesPostResult } from './schemas/IPackagesPostResult';
@@ -37,9 +37,9 @@ export class AppComponent implements OnInit {
     public packageSearchButton: HTMLButtonElement;
     public regExSearchButton: HTMLButtonElement;
 
-    private packageQueries: IPackageQuery[] | null      = null;
+    private packageQueries: IPackageQuery[] | null     = null;
     public queryOffset: string | null                  = null;
-    private queryOffsetPrev: string | null                  = null;
+    private queryOffsetPrev: string | null             = null;
     public packagesResult: IPackagesPostResult | null  = null;
     public regExResult: IPackagesPostResult | null     = null;
 
@@ -219,9 +219,55 @@ export class AppComponent implements OnInit {
         this.theader.appendChild(row);
     }
 
+    private MetadataToTr(metadata: IPackageMetadata): HTMLTableRowElement {
+        let row: HTMLTableRowElement = document.createElement('tr');
+
+        let th: HTMLTableCellElement = document.createElement('th');
+        if (metadata.Name) {
+            th.innerText = metadata.Name;
+        }
+        row.appendChild(th);
+
+        th = document.createElement('th');
+        if (metadata.Version) {
+            th.innerText = metadata.Version;
+        }
+        row.appendChild(th);
+
+        th = document.createElement('th');
+        if (metadata.ID) {
+            th.innerText = metadata.ID;
+        }
+        row.appendChild(th);
+
+        let pPackage: Promise<IPackage | null> | null = null;
+
+        th = document.createElement('th');
+        let button: HTMLButtonElement = document.createElement("button");
+        button.innerText = 'Download Content';
+        button.onclick = async (event: MouseEvent) => {
+            button.disabled = true;
+
+            if (pPackage != null) {
+                pPackage = this.packageIdGetRequest(metadata.ID!);
+            }
+
+            let pkg: IPackage | null = await pPackage;
+
+            if (pkg) {
+
+            }
+
+            button.disabled = false;
+        };
+        row.appendChild(th);
+
+        return row;
+    }
+
     private displayMetadata(metadata: IPackageMetadata[]): void {
         AppComponent.removeRowsFromTable(this.tbody);
-        metadata.forEach((m) => this.tbody.appendChild(MetadataToTr(m)));
+        metadata.forEach((m) => this.tbody.appendChild(this.MetadataToTr(m)));
     }
 
     private async displayPackagesResult(): Promise<void> {
@@ -419,12 +465,7 @@ export class AppComponent implements OnInit {
         console.log(JSON.stringify(packageQueries))
 
         let res: HttpAnyResponse<IPackageMetadata[]> = await this.postRequest<IPackageQuery[], IPackageMetadata[]>(
-            '/packages', packageQueries, params, {
-                "X-Authorization": this.authToken,
-                "Content-Type": "application/json",
-                "accept": "*/*",
-                "Response-Type": "text"
-            });
+            '/packages', packageQueries, params, { "X-Authorization": this.authToken });
 
         let response: HttpResponse<IPackageMetadata[]> | null = res as HttpResponse<IPackageMetadata[]>;
 
@@ -527,11 +568,6 @@ export class AppComponent implements OnInit {
             (resolve) => {
                 this.http.put('/authenticate', authRequest, {
                     observe: 'response',
-                    headers: {
-                        "Content-Type": "application/json",
-                        "accept": "*/*",
-                        "Response-Type": "text"
-                    },
                     responseType: "text"
                 }).pipe(take(1), catchError((error: HttpErrorResponse) => {
                     resolve(error);
