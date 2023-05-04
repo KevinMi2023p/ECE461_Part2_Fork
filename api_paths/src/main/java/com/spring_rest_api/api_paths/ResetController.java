@@ -29,7 +29,7 @@ public class ResetController {
     @DeleteMapping(value = "/reset")
     public ResponseEntity<String> reset(@RequestHeader("X-Authorization") String token) {
         try {
-            if(validateToken(token) == false) 
+            if(!authenticateService.validateAuthHeaderForAdmin(token)) 
                 return badRequestError;
 
             if (resetService.checkAdminToken(token) == false)
@@ -44,14 +44,6 @@ public class ResetController {
         } catch (Exception e) {
             System.err.println("Something failed in reset");
             return badRequestError;
-        }
-    }
-
-    private boolean validateToken(String token) {
-        try {
-            return authenticateService.validateJwtToken(token);
-        } catch (Exception e) {
-            return false;
         }
     }
 
