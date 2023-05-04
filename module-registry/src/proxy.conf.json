@@ -1,0 +1,22 @@
+{
+    "/packages": {
+        "target": "http://172.27.69.157:8080",
+        "secure": false,
+        "logLevel": "debug"
+    },
+    "/reset": {
+        "target": "http://172.27.69.157:8080",
+        "secure": false,
+        "logLevel": "debug"
+    },
+    "/package/**": {
+        "target": "http://172.27.69.157:8080",
+        "secure": false,
+        "logLevel": "debug"
+    },
+    "/authenticate": {
+        "target": "http://172.27.69.157:8080",
+        "secure": false,
+        "logLevel": "debug"
+    }
+}
