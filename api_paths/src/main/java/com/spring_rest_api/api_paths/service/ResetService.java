@@ -52,6 +52,29 @@ public class ResetService {
         return adminFlag;
     }
 
+    private boolean clearSubCollection(CollectionReference linkedListSubCollection) {
+        boolean result = true;
+
+        try {
+            ApiFuture<QuerySnapshot> future = linkedListSubCollection.limit(this.batchSize).get();
+            int deleted = 0;
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            for (QueryDocumentSnapshot document : documents) {
+                document.getReference().delete();
+                deleted += 1;
+            }
+            if (deleted >= batchSize) {
+                // retrieve and delete another batch
+                result &= clearCollection();
+            }
+        } catch (Exception e) {
+            System.err.println("Error deleting subcollection : " + e.getMessage());
+            result = false;
+        }
+
+        return result;
+    }
+
 
     /**
      * Delete a collection in batches to avoid out-of-memory errors. Batch size may be tuned based on
@@ -65,6 +88,12 @@ public class ResetService {
             int deleted = 0;
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
             for (QueryDocumentSnapshot document : documents) {
+
+                for (CollectionReference subCollection : document.getReference().listCollections()) {
+                    System.out.println(subCollection.getId());
+                    this.clearSubCollection(subCollection);
+                }
+                
                 document.getReference().delete();
                 deleted += 1;
             }
