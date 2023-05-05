@@ -21,13 +21,13 @@ import java.util.List;
 public class ResetService {
     // private final String COLLECTION_NAME = "Packages";
     private final CollectionReference packageCollectionReference = FirestoreClient.getFirestore().collection("Packages");
-    private final CollectionReference tokenUseageCollectionReference = FirestoreClient.getFirestore().collection("TokenUsage");
+    private final CollectionReference tokenUsageCollectionReference = FirestoreClient.getFirestore().collection("TokenUsage");
     private final CollectionReference usersCollectionReference = FirestoreClient.getFirestore().collection("Users");
     private int batchSize = 1000;
 
 
     public boolean checkAdminToken(String token) throws ExecutionException, InterruptedException {
-        Query query = tokenUseageCollectionReference.whereEqualTo("hashedToken", token);
+        Query query = tokenUsageCollectionReference.whereEqualTo("hashedToken", token);
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
         List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
 
@@ -80,4 +80,48 @@ public class ResetService {
         return result;
     }
 
+    public boolean clearUsersCollection() throws ExecutionException, InterruptedException {
+        boolean result = true;
+        try {
+            ApiFuture<QuerySnapshot> future = usersCollectionReference.limit(this.batchSize).get();
+            int deleted = 0;
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            for (QueryDocumentSnapshot document : documents) {
+                document.getReference().delete();
+                deleted += 1;
+            }
+            if (deleted >= batchSize) {
+                // retrieve and delete another batch
+                result &= clearUsersCollection();
+            }
+        } catch (Exception e) {
+            System.err.println("Error deleting users collection : " + e.getMessage());
+            result = false;
+        }
+
+        return result;
+    }
+
+    public boolean clearTokenUsageCollection() throws ExecutionException, InterruptedException {
+        boolean result = true;
+        try {
+            ApiFuture<QuerySnapshot> future = tokenUsageCollectionReference.limit(this.batchSize).get();
+            int deleted = 0;
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            for (QueryDocumentSnapshot document : documents) {
+                document.getReference().delete();
+                deleted += 1;
+            }
+            if (deleted >= batchSize) {
+                // retrieve and delete another batch
+                result &= clearTokenUsageCollection();
+            }
+        } catch (Exception e) {
+            System.err.println("Error deleting token usage collection : " + e.getMessage());
+            result = false;
+        }
+
+        return result;
+    }
 }
+
