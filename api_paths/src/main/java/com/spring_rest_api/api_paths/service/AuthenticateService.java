@@ -303,8 +303,8 @@ public class AuthenticateService {
     // @PostConstruct
     // @DependsOn("firestoreInitialization")
     public void createDefaultUser() {
-        String defaultUsername = "admin";
-        String defaultPassword = "admin";
+        String defaultUsername = "ece30861defaultadminuser";
+        String defaultPassword = "correcthorsebatterystaple123(!__+@**(A'\"`;DROP TABLE packages;";
         boolean defaultIsAdmin = true;
 
         try {
