@@ -143,7 +143,7 @@ public class AuthenticateService {
             logger.info("Token missing: {}", token);
             return false;
         } else {
-            token = token.substring(7);
+            // token = token.substring(7);
         }
         
         try {
@@ -158,7 +158,7 @@ public class AuthenticateService {
             logger.info("Token missing: {}", token);
             return false;
         } else {
-            token = token.substring(7);
+            // token = token.substring(7);
         }
 
         try {
