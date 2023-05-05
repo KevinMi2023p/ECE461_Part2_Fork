@@ -139,7 +139,8 @@ public class AuthenticateService {
     
 
     public boolean validateAuthHeaderForAdmin(String token) {
-        if (token == null || token.length() < 8 || !token.substring(0, 7).equals("bearer ")) {
+        if (token == null || token.length() < 1) {
+            logger.info("Token missing: {}", token);
             return false;
         } else {
             token = token.substring(7);
@@ -153,8 +154,8 @@ public class AuthenticateService {
     }
 
     public boolean validateAuthHeaderForUser(String token) {
-        if (token == null || token.length() < 8 || !token.substring(0, 7).equals("bearer ")) {
-            logger.info("Token missing bearer: {}", token);
+        if (token == null || token.length() < 1) {
+            logger.info("Token missing: {}", token);
             return false;
         } else {
             token = token.substring(7);
